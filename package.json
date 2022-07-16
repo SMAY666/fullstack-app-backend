@@ -1,0 +1,19 @@
+{
+  "name": "fullstack-app-monorepo",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "lerna run start",
+    "build": "lerna run build",
+    "start:dev": "lerna run start:dev",
+    "build:dev": "lerna run build:dev",
+    "start:watch": "lerna run start:watch"
+  },
+  "author": {
+    "name": "Matvey Sazonov",
+    "email": "sazonov_15.03@mail.ru"
+  },
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "lerna": "^5.1.8"
+  }
+}

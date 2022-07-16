@@ -1,0 +1,15 @@
+# Development
+/.idea
+/.vs
+
+# Dependencies
+/**/node_modules
+
+# Product
+/**/dist
+
+# Enviroment
+/.env
+
+# MacOS
+/**/.DS_Store

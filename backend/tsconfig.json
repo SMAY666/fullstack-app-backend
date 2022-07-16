@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig-checks.json",
+  "compilerOptions": {
+    /*** Language and Environment *************************************************************************************/
+    "target": "ES6",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    /*** Modules ******************************************************************************************************/
+    "module": "commonjs",
+    "rootDir": "./src",
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    /*** Emit *********************************************************************************************************/
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "outDir": "./dist",
+    "removeComments": false,
+    /*** Interop Constraints ******************************************************************************************/
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "./src"
+  ]
+}
