@@ -1,5 +1,19 @@
-import app from './app';
+import 'dotenv/config';
+import App from './app'
+import {cleanEnv, port} from 'envalid';
 
 
-const PORT = process.env['PORT'] || 5000;
-app.listen(PORT, () => console.log(`[Server]: Server has been started on port ${PORT}...`))
+const env = cleanEnv(process.env, {
+    PORT: port({
+        devDefault: 5000
+    })
+});
+
+const app = new App({
+    port: env.PORT
+})
+
+app.run()
+    .then(() => console.log(`Server is started...`))
+    .catch(error => console.error('Failed to start server.', error));
+

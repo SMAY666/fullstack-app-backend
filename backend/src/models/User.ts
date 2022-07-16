@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
@@ -5,27 +6,27 @@ import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 @Entity()
 export class Role {
     @PrimaryGeneratedColumn()
-    id: number
+        id: number;
 
     @Column()
-    name: string
+        name: string;
 }
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    id: number
+        id: number;
 
     @Column()
-    firstName: string
+        firstName: string;
 
     @Column()
-    middleName: string
+        middleName: string;
 
     @Column()
-    lastName: string
+        lastName: string;
 
     @Column()
-    role: Role
+        role: Role;
 
 }

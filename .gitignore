@@ -9,7 +9,7 @@
 /**/dist
 
 # Enviroment
-/.env
+/**/.env
 
 # MacOS
 /**/.DS_Store
