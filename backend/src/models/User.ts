@@ -2,15 +2,8 @@
 // @ts-nocheck
 
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Role} from './Role';
 
-@Entity()
-export class Role {
-    @PrimaryGeneratedColumn()
-        id: number;
-
-    @Column()
-        name: string;
-}
 
 @Entity()
 export class User {
@@ -28,5 +21,7 @@ export class User {
 
     @Column()
         role: Role;
+    @Column()
+        password: string
 
 }
