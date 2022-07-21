@@ -1,27 +1,36 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 import {Role} from './Role';
 
 
-@Entity()
-export class User {
+@Entity('user')
+export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
-        id: number;
+        public id: number;
 
     @Column()
-        firstName: string;
+        public firstName: string;
 
     @Column()
-        middleName: string;
+        public middleName: string;
 
     @Column()
-        lastName: string;
+       public lastName: string;
 
     @Column()
-        role: Role;
-    @Column()
-        password: string
+        public role: Role;
 
+    @Column({
+        unique: true,
+        transformer: {
+            to: (value: string) => value.toLowerCase(),
+            from: (value: string) => value
+        }
+    })
+        public email: string;
+
+    @Column()
+        public password: string;
 }
