@@ -1,6 +1,6 @@
 import {PassportStatic} from 'passport';
-import {Strategy, ExtractJwt} from "passport-jwt";
-import {User} from "../models";
+import {Strategy, ExtractJwt} from 'passport-jwt';
+import {User} from '../models';
 
 export default (passport: PassportStatic, secretOrKey: string): PassportStatic => {
     const options = {
@@ -11,21 +11,18 @@ export default (passport: PassportStatic, secretOrKey: string): PassportStatic =
     const strategy = new Strategy(options, (payload, done) => {
         User.findOne({
             select: ['id'],
-            where: {
-                id: +payload.userId
-            }
+            where: {id: +payload.userId}
         })
             .then((user) => {
                 if (user) {
-                    done(null, user)
-                }
-                else {
-                    done(user, null)
+                    done(null, user);
+                } else {
+                    done(user, null);
                 }
             })
             .catch((error) => {
-                done(error, null)
-            })
-    })
-    return passport.use(strategy)
-}
+                done(error, null);
+            });
+    });
+    return passport.use(strategy);
+};

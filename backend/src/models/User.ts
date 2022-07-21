@@ -8,19 +8,19 @@ import {Role} from './Role';
 @Entity('user')
 export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
-        public id: number;
+    public id: number;
 
     @Column()
-        public firstName: string;
+    public firstName: string;
 
     @Column()
-        public middleName: string;
+    public middleName: string;
 
     @Column()
-       public lastName: string;
+    public lastName: string;
 
     @Column()
-        public role: Role;
+    public role: Role;
 
     @Column({
         unique: true,
@@ -29,8 +29,8 @@ export class User extends BaseEntity {
             from: (value: string) => value
         }
     })
-        public email: string;
+    public email: string;
 
     @Column()
-        public password: string;
+    public password: string;
 }

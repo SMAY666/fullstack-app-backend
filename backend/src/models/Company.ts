@@ -3,14 +3,14 @@
 
 
 import {Column, PrimaryGeneratedColumn} from 'typeorm';
-import {User} from "./User";
+import {User} from './User';
 
 export class Company {
     @PrimaryGeneratedColumn()
         id: number;
 
     @Colum()
-        owner: User
+        owner: User;
 
     @Column()
         name: string;

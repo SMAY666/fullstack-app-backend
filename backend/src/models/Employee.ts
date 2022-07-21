@@ -2,30 +2,30 @@
 // @ts-nocheck
 
 import {BaseEntity, Column, PrimaryGeneratedColumn} from 'typeorm';
-import {Company} from "./Company";
+import {Company} from './Company';
 
-export class Employee extends BaseEntity{
+export class Employee extends BaseEntity {
     @PrimaryGeneratedColumn()
-        public id: number;
+    public id: number;
 
     @Column()
         company: Company;
 
     @Column()
-        public firstName: string;
+    public firstName: string;
 
     @Column()
-        public middleName: string;
+    public middleName: string;
 
     @Column()
-        public lastName: string;
+    public lastName: string;
 
     @Column()
-        public dateOfBorn: Date
+    public dateOfBorn: Date;
 
     @Column()
-        public post: string;
+    public post: string;
 
     @Column()
-        public salary: number;
+    public salary: number;
 }

@@ -1,1 +1,1 @@
-export {default as SetPassportJwtStrategy} from './setPassportJwtStrategy'
+export {default as SetPassportJwtStrategy} from './setPassportJwtStrategy';

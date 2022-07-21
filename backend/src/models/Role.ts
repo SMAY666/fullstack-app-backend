@@ -6,10 +6,8 @@ import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 @Entity('role')
 export class Role extends BaseEntity {
     @PrimaryGeneratedColumn()
-        public id: number;
+    public id: number;
 
-    @Column({
-        unique: true
-    })
-        public name: string;
+    @Column({unique: true})
+    public name: string;
 }
