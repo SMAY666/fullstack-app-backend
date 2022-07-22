@@ -1,5 +1,5 @@
 import {DataSource} from 'typeorm';
-import {User, Role, Company, Employee} from './src/models';
+import {User, Role, Company, Employee} from './models';
 
 export type DataBaseConfig = {
     username: string,

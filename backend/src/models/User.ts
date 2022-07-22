@@ -2,7 +2,8 @@
 // @ts-nocheck
 
 import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
-import {Role} from './Role';
+
+// import {Role} from './Role';
 
 
 @Entity('user')
@@ -19,8 +20,11 @@ export class User extends BaseEntity {
     @Column()
     public lastName: string;
 
+    @Column({type: 'date'})
+    public dateOfBorn: string;
+
     @Column()
-    public role: Role;
+    public role: string;
 
     @Column({
         unique: true,

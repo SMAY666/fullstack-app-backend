@@ -1,13 +1,14 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import {BaseEntity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import {BaseEntity, Column, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Company} from './Company';
+
 
 export class Employee extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
-
+    @OneToOne(() => Company)
     @Column()
         company: Company;
 

@@ -1,24 +1,81 @@
 import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan'
+import {DataBase, DataBaseConfig} from "./data-base";
+import setPassportJwtStrategy from "./middlewares/setPassportJwtStrategy";
+import passport from "passport";
+import AuthRouter from "./routers/AuthRouter";
+import {Server} from "http";
 
 
 type AppConfig = {
-    port: number
+    port: number;
+    morganFormat: string;
+    jwt: {
+        secretOrKey: string;
+        expirationTime: string;
+    }
 }
 
 
 export default class App {
-    constructor(config: AppConfig) {
-        this.config = config;
-        this.expressApp = express();
+    constructor(config: AppConfig, dataBaseConfig: DataBaseConfig) {
+        this.port = config.port;
+        setPassportJwtStrategy(passport, config.jwt.secretOrKey);
+
+
+        this.expressApp = express()
+            .use(express.json())
+            .use(express.urlencoded({extended: true}))
+            .use(cors())
+            .use(morgan(config.morganFormat))
+            .use(passport.initialize())
+
+        this.dataBase = new DataBase(dataBaseConfig);
     }
 
-    private config: AppConfig;
-    private expressApp: express.Express;
+    //-----[PRIVATE PROPERTIES]-----
 
+    private readonly port: number;
+    private readonly expressApp: express.Express;
+
+    private dataBase: DataBase;
+    private server: Server | undefined
+
+
+
+    //-----[PRIVATE METHODS]-----
+
+    private addRoters(config: AppConfig): void {
+        (new AuthRouter(this.expressApp, config.jwt));
+    }
+
+    //-----[PUBLIC METHODS]-----
 
     public run(): Promise<void> {
-        return new Promise((resolve) => {
-            this.expressApp.listen(this.config.port, resolve);
+        if (this.server) {
+            return Promise.reject(new Error("Server is already running."))
+        }
+        return new Promise((resolve, reject) => {
+            this.server = this.expressApp.listen(this.port);
+            this.dataBase.connect()
+                .then(() => {
+                    resolve()
+                })
+                .catch(error => reject(new Error(`Failed to connect to database: ${error.message}`)));
         });
+    }
+
+    public stop(): Promise<void> {
+        if (!this.server) {
+            return Promise.reject(new Error('Server is not running.'));
+        }
+        return new Promise((resolve, reject) => {
+            this.server?.close();
+            this.dataBase.disconnect()
+                .then(resolve)
+                .catch(reject)
+        })
+
     }
 }

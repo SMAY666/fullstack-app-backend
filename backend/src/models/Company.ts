@@ -2,23 +2,23 @@
 // @ts-nocheck
 
 
-import {Column, PrimaryGeneratedColumn} from 'typeorm';
+import {BaseEntity, Column, PrimaryGeneratedColumn} from 'typeorm';
 import {User} from './User';
 
-export class Company {
+export class Company extends BaseEntity{
     @PrimaryGeneratedColumn()
-        id: number;
-
-    @Colum()
-        owner: User;
+        public id: number;
 
     @Column()
-        name: string;
+       public owner: User;
 
     @Column()
-        description: string;
+        public name: string;
 
-    @Column
-        email: string;
+    @Column()
+        public description: string;
+
+    @Column()
+        public email: string;
 
 }
