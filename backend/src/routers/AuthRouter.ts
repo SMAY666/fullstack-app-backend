@@ -1,5 +1,5 @@
 import {Express, Router, Response, Request} from 'express';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 import {User} from '../models';
 import {checkHttpRequestParameters, Password, HttpErrorHandler} from '../utils';
@@ -15,7 +15,7 @@ export default class AuthRouter {
 
         const router = Router()
             .post('/register', this.register.bind(this))
-            .post('/login', this.login.bind(this))
+            .post('/login', this.login.bind(this));
 
         expressApp.use('/api/auth', router);
     }
@@ -61,9 +61,7 @@ export default class AuthRouter {
                 password: Password.calculateHash(request.body.password)
             });
             await newUser.save();
-            response.status(201).json({
-                "message": "User registred success"
-            });
+            response.status(201).json({message: 'User registred success'});
 
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
@@ -83,22 +81,19 @@ export default class AuthRouter {
 
             const candidate = await User.findOneBy({email});
 
+
             if (!candidate || !Password.check(request.body.password, candidate.password)) {
                 HttpErrorHandler.invalidParameter(response);
                 return;
             }
 
             const token = jwt.sign(
-                {
-                    userId: candidate.id
-                },
+                {userId: candidate.id},
                 this.options.secretOrKey,
-                {
-                    expiresIn: this.options.expirationTime
-                }
-            )
+                {expiresIn: this.options.expirationTime}
+            );
 
-            response.status(200).json(token)
+            response.status(200).json(token);
 
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);

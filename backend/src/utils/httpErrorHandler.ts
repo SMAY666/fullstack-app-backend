@@ -1,9 +1,6 @@
 import {Response} from 'express';
 
 export default abstract class HttpErrorHandler {
-    constructor() {
-
-    }
 
     // -----[PUBLIC STATIC METHODS]-----
 

@@ -5,20 +5,19 @@
 import {BaseEntity, Column, PrimaryGeneratedColumn} from 'typeorm';
 import {User} from './User';
 
-export class Company extends BaseEntity{
+export class Company extends BaseEntity {
     @PrimaryGeneratedColumn()
-        public id: number;
+    public id: number;
 
     @Column()
-       public owner: User;
+    public owner: User;
 
     @Column()
-        public name: string;
+    public name: string;
 
     @Column()
-        public description: string;
+    public description: string;
 
     @Column()
-        public email: string;
-
+    public email: string;
 }

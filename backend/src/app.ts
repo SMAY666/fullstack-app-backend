@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan'
+
 import {DataBase, DataBaseConfig} from "./data-base";
 import setPassportJwtStrategy from "./middlewares/setPassportJwtStrategy";
 import passport from "passport";
@@ -30,6 +31,8 @@ export default class App {
             .use(cors())
             .use(morgan(config.morganFormat))
             .use(passport.initialize())
+
+        this.addRoters(config)
 
         this.dataBase = new DataBase(dataBaseConfig);
     }
