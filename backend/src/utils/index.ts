@@ -1,10 +1,10 @@
 import HttpErrorHandler from './httpErrorHandler'
-import CheckHttpRequestParameters from "./checkHttpRequestParameters";
+import checkHttpRequestParameters from "./checkHttpRequestParameters";
 import Password from "./Password";
 
 export {
     HttpErrorHandler,
-    CheckHttpRequestParameters,
+    checkHttpRequestParameters,
     Password
 
 }
