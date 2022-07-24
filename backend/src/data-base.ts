@@ -1,5 +1,5 @@
 import {DataSource} from 'typeorm';
-import {User, Role, Company, Employee} from './models';
+import {Role, Company, Employee} from './models';
 
 export type DataBaseConfig = {
     username: string,
@@ -21,7 +21,7 @@ export class DataBase {
             database: config.name,
             synchronize: true,
             logging: true,
-            entities: [User, Role, Company, Employee],
+            entities: [Role, Company, Employee],
             subscribers: [],
             migrations: []
         })

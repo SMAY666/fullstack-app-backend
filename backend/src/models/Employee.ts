@@ -8,9 +8,9 @@ import {Company} from './Company';
 export class Employee extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
-    @ManyToOne(type => Company, company => company.id)
+    
     @Column()
-    public company: Company;
+    public company: string;
 
     @Column()
     public firstName: string;
@@ -21,12 +21,28 @@ export class Employee extends BaseEntity {
     @Column()
     public lastName: string;
 
-    @Column()
-    public dateOfBorn: Date;
+    @Column({type: 'date'})
+    public dateOfBorn: string;
 
     @Column()
     public post: string;
 
     @Column()
     public salary: number;
+
+    @Column()
+    public role: string
+
+    @Column({
+        unique: true,
+        transformer:
+            {
+                to: (value: string) => value.toLowerCase(),
+                from: (value: string) => value
+            }
+    })
+    public email: string
+
+    @Column()
+    public passwordHash: string
 }

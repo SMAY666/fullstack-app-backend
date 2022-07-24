@@ -22,8 +22,7 @@ export default abstract class HttpErrorHandler {
 
     public static internalServer(response: Response, error: Error | unknown): void {
         response.status(500).json({
-            message: `An internal server error has occurred: ${(error instanceof Error)
-                ? error.message : error}`
+            message: `An internal server error has occurred: ${(error instanceof Error) ? error.message : error}`
         });
     }
 
