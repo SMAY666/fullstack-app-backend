@@ -20,6 +20,10 @@ export default abstract class HttpErrorHandler {
         response.status(401).json({message: 'The user with this email is already registered'});
     }
 
+    public static userNotFound(response: Response): void {
+        response.status(404).json({message: 'User not found'});
+    }
+
     public static internalServer(response: Response, error: Error | unknown): void {
         response.status(500).json({
             message: `An internal server error has occurred: ${(error instanceof Error) ? error.message : error}`

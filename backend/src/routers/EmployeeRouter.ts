@@ -8,7 +8,9 @@ export default class EmploteeRouter
         const router = Router()
             .post('/register', this.register.bind(this))
             .get('/:id')
-            .delete('/:id');
+            .get('/all')
+            .patch('/:id')
+            .delete('/:id', this.delete.bind(this));
         expressApp.use('/api/emplyee', router);
     }
 
@@ -62,6 +64,38 @@ export default class EmploteeRouter
                 message: "Employee created succsess"
             })
             return
+        }
+        catch(error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async delete(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {email}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: email, type: 'string'}
+            ], response)) {
+                HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+
+            const candidate = await Employee.findOneBy({email});
+
+            if (!candidate) {
+                HttpErrorHandler.userNotFound(response);
+                return;
+            }
+            const employee = await Employee.delete({
+                email: request.body.email
+            })
+            
+            Employee.save;
+
+            response.status(200).json({
+                message: 'Employee deleted success'
+            });
         }
         catch(error) {
             HttpErrorHandler.internalServer(response, error);
