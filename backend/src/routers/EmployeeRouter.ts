@@ -1,24 +1,37 @@
-import { Router, Express, Response, Request } from "express";
-import { Employee } from "../models";
-import { checkHttpRequestParameters, HttpErrorHandler, Password } from "../utils";
+import {Router, Express, Response, Request} from 'express';
+import {REPL_MODE_SLOPPY} from 'repl';
+import {Employee} from '../models';
+import {checkHttpRequestParameters, HttpErrorHandler, Password} from '../utils';
 
-export default class EmploteeRouter
-{
+export default class EmploteeRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/register', this.register.bind(this))
             .get('/:id')
             .get('/all')
-            .patch('/:id')
+            .patch('/:id', this.update.bind(this))
             .delete('/:id', this.delete.bind(this));
         expressApp.use('/api/emplyee', router);
     }
 
-    //-----[PRIVATE METHODS]-----
+    // -----[PRIVATE METHODS]-----
 
     private async register(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {company, firstName, middleName, lastName, dateOfBorn, post, salary, role, email, passwordHash}} = request;
+            const {
+                body: {
+                    company,
+                    firstName,
+                    middleName,
+                    lastName,
+                    dateOfBorn,
+                    post,
+                    salary,
+                    role,
+                    email,
+                    passwordHash
+                }
+            } = request;
 
             if (!checkHttpRequestParameters([
                 {value: company, type: 'string'},
@@ -36,7 +49,7 @@ export default class EmploteeRouter
                 },
                 {value: passwordHash, type: 'string', condition: (value: string) => (value.length >= 6)}
             ], response)) {
-                return
+                return;
             }
 
             const candidate = await Employee.findOneBy({email});
@@ -60,12 +73,9 @@ export default class EmploteeRouter
             });
             emplyee.save();
 
-            response.status(201).json({
-                message: "Employee created succsess"
-            })
-            return
-        }
-        catch(error) {
+            response.status(201).json({message: 'Employee created succsess'});
+            return;
+        } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -87,17 +97,47 @@ export default class EmploteeRouter
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
-            const employee = await Employee.delete({
-                email: request.body.email
-            })
+            await Employee.delete({email: request.body.email});
             
             Employee.save;
 
-            response.status(200).json({
-                message: 'Employee deleted success'
-            });
+            response.status(200).json({message: 'Employee deleted success'});
+        } catch(error) {
+            HttpErrorHandler.internalServer(response, error);
         }
-        catch(error) {
+    }
+
+    private async update(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id, post, role, salary}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'},
+                {value: post, type: 'string', optional: true},
+                {value: role, type: 'string', optional: true},
+                {value: salary, type: 'number', optional: true}
+            ], response)) {
+                HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+
+            const employee = await Employee.findOneBy({id: +id});
+
+            if (!employee) {
+                HttpErrorHandler.userNotFound(response);
+                return;
+            }
+
+            const updated = {
+                post: request.body.post ?? employee.post,
+                role: request.body.role ?? employee.role,
+                salary: request.body.salary ?? employee.salary
+            };
+
+            await Employee.update({id: employee.id}, updated);
+            await Employee.save;            
+            response.status(200).json({message: 'Employee updated sccess'});
+        } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }

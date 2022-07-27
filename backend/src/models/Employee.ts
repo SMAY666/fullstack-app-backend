@@ -31,7 +31,7 @@ export class Employee extends BaseEntity {
     public salary: number;
 
     @Column()
-    public role: string
+    public role: string;
 
     @Column({
         unique: true,
@@ -41,8 +41,8 @@ export class Employee extends BaseEntity {
                 from: (value: string) => value
             }
     })
-    public email: string
+    public email: string;
 
     @Column()
-    public passwordHash: string
+    public passwordHash: string;
 }

@@ -1,7 +1,7 @@
-import AuthRouter from "./AuthRouter";
-import EmploteeRouter from "./EmployeeRouter";
+import AuthRouter from './AuthRouter';
+import EmploteeRouter from './EmployeeRouter';
 
 export {
     AuthRouter,
     EmploteeRouter
-}
+};
