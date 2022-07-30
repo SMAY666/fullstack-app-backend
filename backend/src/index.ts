@@ -14,7 +14,7 @@ const env = cleanEnv(process.env, {
         docs: 'https://www.npmjs.com/package/morgan'
     }),
     JWT_SECRET_OR_KEY: str(),
-    JWT_EXPIRATION_TIME: str({default: '1M'}),
+    JWT_EXPIRATION_TIME: str({default: '1d'}),
     DB_USERNAME: str({
         default: 'postgres'
     }),

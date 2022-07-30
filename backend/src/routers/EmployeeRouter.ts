@@ -1,17 +1,18 @@
 import {Router, Express, Response, Request} from 'express';
-import {REPL_MODE_SLOPPY} from 'repl';
+import passport from 'passport';
+
 import {Employee} from '../models';
 import {checkHttpRequestParameters, HttpErrorHandler, Password} from '../utils';
 
 export default class EmploteeRouter {
     constructor(expressApp: Express) {
         const router = Router()
-            .post('/register', this.register.bind(this))
-            .get('/:id')
-            .get('/all')
-            .patch('/:id', this.update.bind(this))
+            .post('/register', passport.authenticate('jwt', {session: false}), this.register.bind(this))
+            .get('/all', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
+            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .patch('/:id', passport.authenticate('jwt', {session: false}),this.update.bind(this))
             .delete('/:id', this.delete.bind(this));
-        expressApp.use('/api/emplyee', router);
+        expressApp.use('/api/emplyee', passport.authenticate('jwt', {session: false}), router);
     }
 
     // -----[PRIVATE METHODS]-----
@@ -99,7 +100,7 @@ export default class EmploteeRouter {
             }
             await Employee.delete({email: request.body.email});
             
-            Employee.save;
+            await Employee.save;
 
             response.status(200).json({message: 'Employee deleted success'});
         } catch(error) {
@@ -141,4 +142,46 @@ export default class EmploteeRouter {
             HttpErrorHandler.internalServer(response, error);
         }
     }
+
+    private async getById(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'}
+            ], response)) {
+                HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+
+            const employee = await Employee.findOneBy({id: +id});
+
+            if (!employee) {
+                HttpErrorHandler.userNotFound(response);
+                return;
+            }
+            
+            response.status(200).json(employee);
+            return;
+        }
+        catch(error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async getAll(request: Request, response: Response): Promise<void> {
+        try {
+            const employees = await Employee.find();
+
+            if (!employees) {
+                HttpErrorHandler.userNotFound(response);
+                return;
+            }
+            response.status(200).json(employees);
+            return;
+        }
+        catch(error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    } 
 }
