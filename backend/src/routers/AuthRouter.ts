@@ -1,3 +1,4 @@
+import { config } from 'dotenv';
 import {Express, Router, Response, Request} from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -48,7 +49,7 @@ export default class AuthRouter {
                 this.options.secretOrKey,
                 {expiresIn: this.options.expirationTime}
             );
-
+            
             response.status(200).json(token);
 
         } catch (error) {
