@@ -10,7 +10,7 @@ export default class EmploteeRouter {
             .post('/register', passport.authenticate('jwt', {session: false}), this.register.bind(this))
             .get('/all', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .patch('/:id', passport.authenticate('jwt', {session: false}),this.update.bind(this))
+            .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
             .delete('/:id', this.delete.bind(this));
         expressApp.use('/api/emplyee', passport.authenticate('jwt', {session: false}), router);
     }
@@ -21,7 +21,6 @@ export default class EmploteeRouter {
         try {
             const {
                 body: {
-                    company,
                     firstName,
                     middleName,
                     lastName,
@@ -35,7 +34,6 @@ export default class EmploteeRouter {
             } = request;
 
             if (!checkHttpRequestParameters([
-                {value: company, type: 'string'},
                 {value: firstName, type: 'string'},
                 {value: middleName, type: 'string'},
                 {value: lastName, type: 'string'},
@@ -61,7 +59,6 @@ export default class EmploteeRouter {
             }
 
             const emplyee = await Employee.create({
-                company: request.body.company,
                 firstName: request.body.firstName,
                 middleName: request.body.middleName,
                 lastName: request.body.lastName,
@@ -163,8 +160,7 @@ export default class EmploteeRouter {
             
             response.status(200).json(employee);
             return;
-        }
-        catch(error) {
+        } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -179,8 +175,7 @@ export default class EmploteeRouter {
             }
             response.status(200).json(employees);
             return;
-        }
-        catch(error) {
+        } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
     } 

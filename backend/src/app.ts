@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan'
 
-import {DataBase, DataBaseConfig} from "./data-base";
+import {DataBase, DataBaseConfig, MainAdminConfig} from "./data-base";
 import setPassportJwtStrategy from "./middlewares/setPassportJwtStrategy";
 import passport from "passport";
 import {AuthRouter, EmploteeRouter} from "./routers";
@@ -20,7 +20,7 @@ type AppConfig = {
 
 
 export default class App {
-    constructor(config: AppConfig, dataBaseConfig: DataBaseConfig) {
+    constructor(config: AppConfig, dataBaseConfig: DataBaseConfig, mainAdminConfig: MainAdminConfig) {
         this.port = config.port;
         setPassportJwtStrategy(passport, config.jwt.secretOrKey);
 
@@ -34,7 +34,7 @@ export default class App {
 
         this.addRoters(config)
 
-        this.dataBase = new DataBase(dataBaseConfig);
+        this.dataBase = new DataBase(dataBaseConfig, mainAdminConfig);
     }
 
     //-----[PRIVATE PROPERTIES]-----
