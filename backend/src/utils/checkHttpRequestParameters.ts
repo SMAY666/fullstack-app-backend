@@ -20,7 +20,8 @@ export default (parameters: Parameter[], response: Response): boolean => {
             HttpErrorHandler.missingParameters(response);
             return false;
         }
-        if ((typeof parameter.value != parameter.type) || (parameter.condition && !parameter.condition(parameter.value))) {
+        if ((typeof parameter.value != parameter.type) || 
+            (parameter.condition && !parameter.condition(parameter.value))) {
             HttpErrorHandler.invalidParameter(response);
             return false;
         }

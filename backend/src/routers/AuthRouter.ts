@@ -1,4 +1,3 @@
-import { config } from 'dotenv';
 import {Express, Router, Response, Request} from 'express';
 import jwt from 'jsonwebtoken';
 

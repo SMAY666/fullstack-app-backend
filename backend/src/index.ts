@@ -27,6 +27,12 @@ const env = cleanEnv(process.env, {
     }),
     DB_NAME: str({
         default: 'MOA_System'
+    }),
+    MAIN_ADMIN_LOGIN: str({
+        default: 'admin'
+    }),
+    MAIN_ADMIN_PASSWORD: str({
+        default: 'admin'
     })
 
 
@@ -47,6 +53,9 @@ const app = new App(
         host: env.DB_HOST,
         port: env.DB_PORT,
         name: env.DB_NAME
+    }, {
+        login: env.MAIN_ADMIN_LOGIN,
+        password: env.MAIN_ADMIN_PASSWORD
     })
 
 app.run()

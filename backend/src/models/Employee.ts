@@ -2,15 +2,14 @@
 // @ts-nocheck
 
 import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {Company} from './Company';
 
-@Entity('eployees')
+import {Role} from './Role';
+
+
+@Entity('employees')
 export class Employee extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
-    
-    @Column()
-    public company: string;
 
     @Column()
     public firstName: string;
@@ -30,8 +29,8 @@ export class Employee extends BaseEntity {
     @Column()
     public salary: number;
 
-    @Column()
-    public role: string;
+    @ManyToOne(() => Role, role => role.id)
+    public role: Role;
 
     @Column({
         unique: true,
