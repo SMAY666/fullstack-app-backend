@@ -41,9 +41,6 @@ export class DataBase {
     private mainAdminConfig: MainAdminConfig
 
 
-    //-----[PRIVATE VARIABLES]-----
-
-
     //-----[PRIVATE METHODS]-----
 
     private checkMainAdminRole(): Promise<void> {
@@ -73,8 +70,8 @@ export class DataBase {
         })
     }
 
-    private getMainAdminRoleId(): void {
-        
+    private getMainAdminRoleId(): Promise<Role | null> {
+        return Role.findOneBy({name: 'mainAdmin'})
     }
 
 
@@ -97,23 +94,31 @@ export class DataBase {
     }
 
     private createMainAdmin(): Promise<void> {
+        
         return new Promise<void>((resolve, reject) => {
-            const newMainAdmin = Employee.create({
-                firstName: 'admin',
-                middleName: 'admin',
-                lastName: 'admin',
-                dateOfBorn: '2001-01-01',
-                post: 'admin',
-                salary: 0,
-                role: {
-                    id: 2
-                },
-                email: this.mainAdminConfig.login,
-                passwordHash: Password.calculateHash(this.mainAdminConfig.password)
+            this.getMainAdminRoleId()
+            .then((role) => {
+                if (role) {
+                    let mainAdminRoleId = role.id
+
+                    const newMainAdmin = Employee.create({
+                        firstName: 'admin',
+                        middleName: 'admin',
+                        lastName: 'admin',
+                        dateOfBorn: '2001-01-01',
+                        post: 'admin',
+                        salary: 0,
+                        role: {
+                            id: mainAdminRoleId
+                        },
+                        email: this.mainAdminConfig.login,
+                        passwordHash: Password.calculateHash(this.mainAdminConfig.password)
+                    })
+                    newMainAdmin.save()
+                        .then(() => resolve())
+                        .catch(error => reject(new Error(`Failed to create main admin account: ${error.message}`)));
+                }
             })
-            newMainAdmin.save()
-                .then(() => resolve())
-                .catch(error => reject(new Error(`Failed to create main admin account: ${error.message}`)));
         })
     }
 
