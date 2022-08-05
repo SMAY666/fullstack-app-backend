@@ -29,7 +29,7 @@ export class Employee extends BaseEntity {
     @Column()
     public salary: number;
 
-    @ManyToOne(() => Role, role => role.id)
+    @ManyToOne(() => Role, (role) => role.id)
     public role: Role;
 
     @Column({

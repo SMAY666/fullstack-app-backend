@@ -4,6 +4,8 @@ export default abstract class HttpErrorHandler {
 
     // -----[PUBLIC STATIC METHODS]-----
 
+    /* -----Users erroers-----*/
+
     public static missingParameters(response: Response): void {
         response.status(400).json({message: 'One or more required parameters are missing'});
     }
@@ -31,4 +33,10 @@ export default abstract class HttpErrorHandler {
         });
     }
 
+
+    /* -----Roles errors-----*/
+
+    public static roleIsNotUnique(response: Response): void {
+        response.status(401).json({message: 'The role is not unique'});
+    }
 }

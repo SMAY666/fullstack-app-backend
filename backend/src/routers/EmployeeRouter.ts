@@ -71,7 +71,7 @@ export default class EmploteeRouter {
             });
             emplyee.save();
 
-            response.status(201).json({message: 'Employee created succsess'});
+            response.status(201).json({message: 'Employee created succsessfull'});
             return;
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
