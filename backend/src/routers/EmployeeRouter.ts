@@ -8,11 +8,11 @@ export default class EmploteeRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/register', passport.authenticate('jwt', {session: false}), this.register.bind(this))
-            .get('/all', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
+            .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
             .delete('/:id', this.delete.bind(this));
-        expressApp.use('/api/emplyee', passport.authenticate('jwt', {session: false}), router);
+        expressApp.use('/api/employee', passport.authenticate('jwt', {session: false}), router);
     }
 
     // -----[PRIVATE METHODS]-----
@@ -27,7 +27,7 @@ export default class EmploteeRouter {
                     dateOfBorn,
                     post,
                     salary,
-                    role,
+                    roleId,
                     email,
                     passwordHash
                 }
@@ -39,8 +39,8 @@ export default class EmploteeRouter {
                 {value: lastName, type: 'string'},
                 {value: dateOfBorn, type: 'string'},
                 {value: post, type: 'string'},
-                {value: role, type: 'string'},
                 {value: salary, type: 'number'},
+                {value: roleId, type: 'number'},
                 {
                     value: email,
                     type: 'string',
@@ -65,7 +65,9 @@ export default class EmploteeRouter {
                 dateOfBorn: request.body.dateOfBorn,
                 post: request.body.post,
                 salary: request.body.salary,
-                role: request.body.role,
+                role: {
+                    id: request.body.roleId
+                },
                 email: request.body.email,
                 passwordHash: Password.calculateHash(passwordHash)
             });

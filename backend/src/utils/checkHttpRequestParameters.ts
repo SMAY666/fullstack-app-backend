@@ -22,8 +22,8 @@ export default (parameters: Parameter[], response: Response): boolean => {
         }
         if ((typeof parameter.value != parameter.type) || 
             (parameter.condition && !parameter.condition(parameter.value))) {
-            HttpErrorHandler.invalidParameter(response);
-            return false;
+                HttpErrorHandler.invalidParameter(response);
+                return false;
         }
     }
     return true;
