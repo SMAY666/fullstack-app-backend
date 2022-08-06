@@ -99,7 +99,7 @@ export default class EmploteeRouter {
             
             await Employee.save;
 
-            response.status(200).json({message: 'Employee deleted success'});
+            response.status(200).json({message: 'Employee deleted successfull'});
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }

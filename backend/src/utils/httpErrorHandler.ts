@@ -39,4 +39,12 @@ export default abstract class HttpErrorHandler {
     public static roleIsNotUnique(response: Response): void {
         response.status(401).json({message: 'The role is not unique'});
     }
+
+    public static roleNotFound(response: Response): void {
+        response.status(404).json({message: 'Role not found'});
+    }
+
+    public static noAccess(response: Response): void {
+        response.status(403).json({message: 'Role cannot be changed'});
+    }
 }

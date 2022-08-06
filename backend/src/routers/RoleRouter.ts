@@ -12,7 +12,7 @@ export default class RoleRouter {
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}))
             .get('/:id', passport.authenticate('jwt', {session: false}))
-            .delete('/:id', passport.authenticate('jwt', {session: false}));
+            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
         expressApp.use('/api/role', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -48,4 +48,35 @@ export default class RoleRouter {
         }
     }
 
+    private async delete(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id}} = request
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'}
+            ], response)) {
+                return;
+            }
+
+            const role = await Role.findOneBy({id: request.body.id});
+
+            if (!role || role.name == 'mainAdmin') {
+                if (!role) {
+                    HttpErrorHandler.roleNotFound(response);
+                }
+                else if (role.name == 'mainAdmin') {
+                    HttpErrorHandler.noAccess(response);
+                }
+                return;
+            }
+
+            await Role.delete({id: request.body.id});
+            Role.save;
+
+            response.status(200).json({message: 'Role deleted succeessfull'})
+        }
+        catch(error) {
+            HttpErrorHandler.internalServer(response, error)
+        }
+    }
 }
