@@ -10,8 +10,8 @@ export default class RoleRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
-            .get('/', passport.authenticate('jwt', {session: false}))
-            .get('/:id', passport.authenticate('jwt', {session: false}))
+            .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
+            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
         expressApp.use('/api/role', passport.authenticate('jwt', {session: false}), router);
     }
@@ -60,13 +60,12 @@ export default class RoleRouter {
 
             const role = await Role.findOneBy({id: request.body.id});
 
-            if (!role || role.name == 'mainAdmin') {
-                if (!role) {
-                    HttpErrorHandler.roleNotFound(response);
-                }
-                else if (role.name == 'mainAdmin') {
-                    HttpErrorHandler.noAccess(response);
-                }
+            if (!role) {
+                HttpErrorHandler.roleNotFound(response);
+                return;
+            }
+            else if (role.name == 'mainAdmin') {
+                HttpErrorHandler.noAccess(response);
                 return;
             }
 
@@ -74,6 +73,46 @@ export default class RoleRouter {
             Role.save;
 
             response.status(200).json({message: 'Role deleted succeessfull'})
+        }
+        catch(error) {
+            HttpErrorHandler.internalServer(response, error)
+        }
+    }
+
+    private async getById(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'}
+            ], response)) {
+                HttpErrorHandler.invalidParameter(response)
+                return;
+            }
+
+            const role = await Role.findOneBy({id: +id});
+
+            if (!role) {
+                HttpErrorHandler.roleNotFound(response)
+            }
+
+            response.status(200).json(role)
+        }
+        catch(error) {
+            HttpErrorHandler.internalServer(response, error)
+        }
+    }
+
+    private async getAll(request: Request, response: Response): Promise<void> {
+        try {
+            const roles = await Role.find()
+
+            if (!roles) {
+                HttpErrorHandler.roleNotFound(response)
+                return;
+            }
+
+            response.status(200).json(roles)
         }
         catch(error) {
             HttpErrorHandler.internalServer(response, error)

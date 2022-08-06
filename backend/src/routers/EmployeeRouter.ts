@@ -109,16 +109,15 @@ export default class EmploteeRouter {
 
     private async update(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id, post, role, salary}} = request;
+            const {body: {id, post, roleId, salary}} = request;
 
             if (!checkHttpRequestParameters([
                 {value: id, type: 'number'},
                 {value: post, type: 'string', optional: true},
-                {value: role, type: 'string', optional: true},
+                {value: roleId, type: 'number', optional: true},
                 {value: salary, type: 'number', optional: true}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
-                return;
             }
 
             const employee = await Employee.findOneBy({id: +id});
@@ -130,7 +129,9 @@ export default class EmploteeRouter {
 
             const updated = {
                 post: request.body.post ?? employee.post,
-                role: request.body.role ?? employee.role,
+                role: {
+                    id: request.body.roleId ?? employee.role.id
+                },
                 salary: request.body.salary ?? employee.salary
             };
 
