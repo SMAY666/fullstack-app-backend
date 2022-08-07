@@ -1,6 +1,6 @@
 # Development
 /.idea
-/.vs
+/.vscode
 
 # Dependencies
 /**/node_modules
