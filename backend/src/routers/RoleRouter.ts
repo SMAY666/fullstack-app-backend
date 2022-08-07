@@ -104,7 +104,7 @@ export default class RoleRouter {
         try {
             const roles = await Role.find();
 
-            if (!roles) {
+            if (!await Role.count()) {
                 HttpErrorHandler.roleNotFound(response);
                 return;
             }

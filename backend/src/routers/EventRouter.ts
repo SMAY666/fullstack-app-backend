@@ -9,9 +9,9 @@ export default class EventRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
-            .get('/', passport.authenticate('jwt', {session: false}))
-            .get('/:id', passport.authenticate('jwt', {session: false}))
-            .patch('/:id', passport.authenticate('jwt', {session: false}))
+            .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
+            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
             .delete('/:id', passport.authenticate('jwt', {session: false}));
 
         expressApp.use('/api/events', passport.authenticate('jwt', {session: false}), router);
@@ -19,6 +19,25 @@ export default class EventRouter {
 
 
     // -----[PRIVATE METHODS]-----
+
+    private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
+
+        if (typeof dateOfTheBegining == 'undefined') {
+            console.log(dateOfTheBegining, 'is undefiend')
+            dateOfTheBegining = new Date().toLocaleString('ru-RU', { year: 'numeric', month: 'numeric', day: 'numeric' });;
+            dateOfTheBegining = dateOfTheBegining.split(".").reverse().join("-");
+            //console.log(new Date(dateOfTheBegining))
+           // console.log(new Date(dateOfTheEnd))
+        }
+        if (new Date(dateOfTheBegining) >= new Date() &&
+            new Date(dateOfTheEnd) >= new Date() &&
+            new Date(dateOfTheEnd) >= new Date(dateOfTheBegining)){
+                return true;
+        }
+        else {
+            return false
+        }
+    }
 
     private async create(request: Request, response: Response): Promise<void> {
         try {
@@ -30,17 +49,16 @@ export default class EventRouter {
                 {value: dateOfTheBegining, type: 'string', optional: true},
                 {value: dateOfTheEnd, type: 'string'}
             ], response)) {
+                return
+            }
+            if (new Date(dateOfTheBegining) < new Date() ||
+            new Date(dateOfTheEnd) <  new Date() ||
+            new Date(dateOfTheEnd) < new Date(dateOfTheBegining)){
+                console.log('date of the begin', dateOfTheBegining)
+                console.log('date of the end', dateOfTheEnd)
                 HttpErrorHandler.invalidParameter(response);
-                return;
+                return
             }
-
-            if (new Date(request.body.dateOfTheBegining) < new Date() ||
-                 new Date(request.body.dateOfTheEnd) < new Date() ||
-                 new Date(request.body.dateOfTheEnd) < new Date(request.body.dateOfTheBegining)) {
-                HttpErrorHandler.incorrectaDateValue(response);
-                return;
-            }
-
             const newEvent = await Event.create({
                 title: request.body.title,
                 description: request.body.description,
@@ -52,6 +70,80 @@ export default class EventRouter {
 
             response.status(201).json({message: 'Event created successfull'});
         } catch(error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async getAll(request: Request, response: Response): Promise<void> {
+        try {
+            const events = await Event.find();
+
+            if (!await Event.count()) {
+                HttpErrorHandler.emptyEventList(response);
+                return;
+            }
+
+            response.status(200).json(events);
+        } catch(error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async getById(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'}
+            ], response)) {
+                HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+
+            const event = await Event.findOneBy({id: +id});
+
+            if (!event) {
+                HttpErrorHandler.eventNotFound(response);
+                return;
+            }
+
+            response.status(200).json(event);
+        } catch(error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async update(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id, description, status}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'},
+                {value: description, type: 'string', optional: true},
+                {value: status, type: 'string', optional: true}
+            ], response)) {
+                HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+
+            const event = await Event.findOneBy({id: +id});
+
+            if (!event) {
+                HttpErrorHandler.eventNotFound(response);
+                return;
+            }
+
+            const updated = {
+                description: request.body.description ?? event.description,
+                status: request.body.status ?? event.status
+            };
+
+            await Event.update({id: +id}, updated);
+            await Event.save;
+
+            response.status(200).json({message: 'Event edit successfull'})
+
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }

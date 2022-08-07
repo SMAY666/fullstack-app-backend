@@ -168,7 +168,7 @@ export default class EmploteeRouter {
         try {
             const employees = await Employee.find();
 
-            if (!employees) {
+            if (!await Employee.count()) {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }

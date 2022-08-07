@@ -51,7 +51,12 @@ export default abstract class HttpErrorHandler {
 
     /* -----Events table errors-----*/
 
-    public static incorrectaDateValue(response: Response): void {
-        response.status(401).json({message: 'Incorrect date value'});
+    
+    public static emptyEventList(response: Response): void {
+        response.status(404).json({message: 'Event list is empty'});
+    }
+
+    public static eventNotFound(response: Response): void {
+        response.status(404).json({message: 'Event not found'});
     }
 }

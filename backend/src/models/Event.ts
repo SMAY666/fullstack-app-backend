@@ -20,6 +20,6 @@ export class Event extends BaseEntity {
     @Column({type: 'date'})
     public dateOfTheEnd: string;
 
-    @Column({readonly: true})
+    @Column()
     public status: string; // Open / Close
 }
