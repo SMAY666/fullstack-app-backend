@@ -1,25 +1,25 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity('events')
 export class Event extends BaseEntity {
     @PrimaryGeneratedColumn()
-    public id: number
+    public id: number;
 
     @Column()
-    public title: string
+    public title: string;
 
     @Column()
-    public description: string
+    public description: string;
     
     @ Column({type: 'date'})
-    public dateOfTheBegining: string
+    public dateOfTheBegining: string;
 
     @Column({type: 'date'})
-    public dateOfTheEnd: string
+    public dateOfTheEnd: string;
 
     @Column({readonly: true})
-    public status: string  // Open / Close
+    public status: string; // Open / Close
 }

@@ -49,9 +49,9 @@ export default abstract class HttpErrorHandler {
     }
 
 
-    /*-----Events table errors-----*/
+    /* -----Events table errors-----*/
 
     public static incorrectaDateValue(response: Response): void {
-        response.status(401).json({message: 'Incorrect date value'})
+        response.status(401).json({message: 'Incorrect date value'});
     }
 }

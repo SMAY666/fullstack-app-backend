@@ -65,9 +65,7 @@ export default class EmploteeRouter {
                 dateOfBorn: request.body.dateOfBorn,
                 post: request.body.post,
                 salary: request.body.salary,
-                role: {
-                    id: request.body.roleId
-                },
+                role: {id: request.body.roleId},
                 email: request.body.email,
                 passwordHash: Password.calculateHash(passwordHash)
             });
@@ -129,9 +127,7 @@ export default class EmploteeRouter {
 
             const updated = {
                 post: request.body.post ?? employee.post,
-                role: {
-                    id: request.body.roleId ?? employee.role.id
-                },
+                role: {id: request.body.roleId ?? employee.role.id},
                 salary: request.body.salary ?? employee.salary
             };
 
