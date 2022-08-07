@@ -18,7 +18,6 @@ export default (parameters: Parameter[], response: Response): boolean => {
 
         if ((typeof parameter.value == 'undefined') && !parameter.optional) {
             HttpErrorHandler.missingParameters(response);
-            console.log(parameter)
             return false;
         }
         if ((typeof parameter.value != parameter.type) || 

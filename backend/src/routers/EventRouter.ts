@@ -21,20 +21,14 @@ export default class EventRouter {
     // -----[PRIVATE METHODS]-----
 
     private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
-
-        if (typeof dateOfTheBegining == 'undefined') {
-            console.log(dateOfTheBegining, 'is undefiend')
-            dateOfTheBegining = new Date().toLocaleString('ru-RU', { year: 'numeric', month: 'numeric', day: 'numeric' });;
-            dateOfTheBegining = dateOfTheBegining.split(".").reverse().join("-");
-            //console.log(new Date(dateOfTheBegining))
-           // console.log(new Date(dateOfTheEnd))
-        }
         if (new Date(dateOfTheBegining) >= new Date() &&
             new Date(dateOfTheEnd) >= new Date() &&
-            new Date(dateOfTheEnd) >= new Date(dateOfTheBegining)){
+            new Date(dateOfTheBegining) <= new Date(dateOfTheEnd)){
                 return true;
         }
         else {
+            console.log('Date of the begining', dateOfTheBegining)
+            console.log('Date of the end', dateOfTheEnd)
             return false
         }
     }
@@ -46,26 +40,25 @@ export default class EventRouter {
             if (!checkHttpRequestParameters([
                 {value: title, type: 'string'},
                 {value: description, type: 'string'},
-                {value: dateOfTheBegining, type: 'string', optional: true},
+                {value: dateOfTheBegining, type: 'string'},
                 {value: dateOfTheEnd, type: 'string'}
             ], response)) {
                 return
             }
-            if (new Date(dateOfTheBegining) < new Date() ||
-            new Date(dateOfTheEnd) <  new Date() ||
-            new Date(dateOfTheEnd) < new Date(dateOfTheBegining)){
-                console.log('date of the begin', dateOfTheBegining)
-                console.log('date of the end', dateOfTheEnd)
-                HttpErrorHandler.invalidParameter(response);
-                return
-            }
+
             const newEvent = await Event.create({
                 title: request.body.title,
                 description: request.body.description,
-                dateOfTheBegining: request.body.dateOfTheBegining ?? new Date(),
+                dateOfTheBegining: request.body.dateOfTheBegining,
                 dateOfTheEnd: request.body.dateOfTheEnd,
                 status: 'Open'
             });
+
+            if (!this.checkDateValue(newEvent.dateOfTheBegining, newEvent.dateOfTheEnd)) {
+                HttpErrorHandler.invalidParameter(response);
+                return
+            }
+
             await Event.save(newEvent);
 
             response.status(201).json({message: 'Event created successfull'});
