@@ -12,7 +12,7 @@ export default class EmploteeRouter {
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
             .delete('/:id', this.delete.bind(this));
-        expressApp.use('/api/employee', passport.authenticate('jwt', {session: false}), router);
+        expressApp.use('/api/employees', passport.authenticate('jwt', {session: false}), router);
     }
 
     // -----[PRIVATE METHODS]-----

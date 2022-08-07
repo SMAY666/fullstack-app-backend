@@ -47,4 +47,11 @@ export default abstract class HttpErrorHandler {
     public static noAccess(response: Response): void {
         response.status(403).json({message: 'Role cannot be changed'});
     }
+
+
+    /*-----Events table errors-----*/
+
+    public static incorrectaDateValue(response: Response): void {
+        response.status(401).json({message: 'Incorrect date value'})
+    }
 }

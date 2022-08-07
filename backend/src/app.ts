@@ -5,7 +5,7 @@ import morgan from 'morgan'
 import {DataBase, DataBaseConfig, MainAdminConfig} from "./data-base";
 import setPassportJwtStrategy from "./middlewares/setPassportJwtStrategy";
 import passport from "passport";
-import {AuthRouter, EmploteeRouter, RoleRouter} from "./routers";
+import {AuthRouter, EmploteeRouter, EventRouter, RoleRouter} from "./routers";
 import {Server} from "http";
 
 
@@ -53,6 +53,7 @@ export default class App {
         (new AuthRouter(this.expressApp, config.jwt));
         (new EmploteeRouter(this.expressApp));
         (new RoleRouter(this.expressApp));
+        (new EventRouter(this.expressApp));
     }
 
     //-----[PUBLIC METHODS]-----

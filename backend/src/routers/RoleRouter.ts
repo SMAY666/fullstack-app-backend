@@ -13,7 +13,7 @@ export default class RoleRouter {
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
-        expressApp.use('/api/role', passport.authenticate('jwt', {session: false}), router);
+        expressApp.use('/api/roles', passport.authenticate('jwt', {session: false}), router);
     }
 
 
