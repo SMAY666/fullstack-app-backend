@@ -27,8 +27,6 @@ export default class EventRouter {
                 return true;
         }
         else {
-            console.log('Date of the begining', dateOfTheBegining)
-            console.log('Date of the end', dateOfTheEnd)
             return false
         }
     }
