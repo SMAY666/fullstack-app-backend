@@ -12,7 +12,7 @@ export default class EventRouter {
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', passport.authenticate('jwt', {session: false}));
+            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
 
         expressApp.use('/api/events', passport.authenticate('jwt', {session: false}), router);
     }
@@ -23,11 +23,10 @@ export default class EventRouter {
     private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
         if (new Date(dateOfTheBegining) >= new Date() &&
             new Date(dateOfTheEnd) >= new Date() &&
-            new Date(dateOfTheBegining) <= new Date(dateOfTheEnd)){
-                return true;
-        }
-        else {
-            return false
+            new Date(dateOfTheBegining) <= new Date(dateOfTheEnd)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -41,7 +40,7 @@ export default class EventRouter {
                 {value: dateOfTheBegining, type: 'string'},
                 {value: dateOfTheEnd, type: 'string'}
             ], response)) {
-                return
+                return;
             }
 
             const newEvent = await Event.create({
@@ -54,7 +53,7 @@ export default class EventRouter {
 
             if (!this.checkDateValue(newEvent.dateOfTheBegining, newEvent.dateOfTheEnd)) {
                 HttpErrorHandler.invalidParameter(response);
-                return
+                return;
             }
 
             await Event.save(newEvent);
@@ -132,9 +131,29 @@ export default class EventRouter {
             await Event.update({id: +id}, updated);
             await Event.save;
 
-            response.status(200).json({message: 'Event edit successfull'})
+            response.status(200).json({message: 'Event edit successfull'});
 
         } catch (error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async delete(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id}} = request;
+            
+            const event = await Event.findOneBy({id: +id});
+
+            if (!event) {
+                HttpErrorHandler.eventNotFound(response);
+                return;
+            }
+
+            await Event.delete({id: +id});
+            await Event.save;
+
+            response.status(200).json({message: 'Event deleted successfull'});
+        } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
