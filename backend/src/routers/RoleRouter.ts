@@ -27,7 +27,7 @@ export default class RoleRouter {
                 {
                     value: name, 
                     type: 'string',
-                    condition: (value: string) => value != 'mainAdmin'
+                    condition: (value) => (value as string) != 'mainAdmin'
                 }
             ], response)) {
                 return;

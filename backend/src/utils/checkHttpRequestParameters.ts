@@ -6,7 +6,7 @@ import {HttpErrorHandler} from './index';
 type Parameter = {
     value: number | string | undefined;
     type: string;
-    condition?: (value: any) => boolean;
+    condition?: (value: number | string | undefined) => boolean;
     optional?: boolean;
 };
 
