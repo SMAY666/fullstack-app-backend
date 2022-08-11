@@ -141,7 +141,7 @@ export default class EventRouter {
     private async delete(request: Request, response: Response): Promise<void> {
         try {
             const {body: {id}} = request;
-            
+
             const event = await Event.findOneBy({id: +id});
 
             if (!event) {

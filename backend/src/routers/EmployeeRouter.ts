@@ -46,7 +46,10 @@ export default class EmploteeRouter {
                     type: 'string',
                     condition: (value: string) => !!value.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
                 },
-                {value: passwordHash, type: 'string', condition: (value: string) => (value.length >= 6)}
+                {
+                    value: passwordHash, type: 'string',
+                    condition: (value: string) => (value.length >= 6)
+                }
             ], response)) {
                 return;
             }
@@ -96,7 +99,7 @@ export default class EmploteeRouter {
                 return;
             }
             await Employee.delete({email: request.body.email});
-            
+
             await Employee.save;
 
             response.status(200).json({message: 'Employee deleted successfull'});
@@ -132,7 +135,7 @@ export default class EmploteeRouter {
             };
 
             await Employee.update({id: employee.id}, updated);
-            await Employee.save;            
+            await Employee.save;
             response.status(200).json({message: 'Employee updated sccess'});
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
@@ -156,7 +159,7 @@ export default class EmploteeRouter {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
-            
+
             response.status(200).json(employee);
             return;
         } catch(error) {
@@ -177,5 +180,5 @@ export default class EmploteeRouter {
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
-    } 
+    }
 }

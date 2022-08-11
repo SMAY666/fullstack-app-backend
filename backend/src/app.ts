@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan'
 
-import {DataBase, DataBaseConfig, MainAdminConfig} from "./data-base";
+import {DataBase, DataBaseConfig, MainAdminConfig} from "./DataBase";
 import setPassportJwtStrategy from "./middlewares/setPassportJwtStrategy";
 import passport from "passport";
 import {AuthRouter, EmploteeRouter, EventRouter, RoleRouter} from "./routers";
