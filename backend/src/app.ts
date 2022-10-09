@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import {Server} from 'http';
+import passport from 'passport';
 
 import {DataBase, DataBaseConfig, MainAdminConfig} from './DataBase';
 import setPassportJwtStrategy from './middlewares/setPassportJwtStrategy';
-import passport from 'passport';
 import {AuthRouter, EmploteeRouter, EventRouter, RoleRouter} from './routers';
-import {Server} from 'http';
 
 
 type AppConfig = {

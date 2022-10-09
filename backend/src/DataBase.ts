@@ -1,6 +1,6 @@
 import {DataSource} from 'typeorm';
 import {Password} from './utils';
-import {Role, Employee, Event} from './models';
+import {Role, Employee, Event, Customer, Document} from './models';
 
 
 export type DataBaseConfig = {
@@ -28,7 +28,7 @@ export class DataBase {
             database: config.name,
             synchronize: true,
             logging: true,
-            entities: [Role, Employee, Event],
+            entities: [Role, Employee, Event, Document, Customer],
             subscribers: [],
             migrations: []
         });
@@ -88,7 +88,7 @@ export class DataBase {
     }
 
     private createMainAdmin(): Promise<void> {
-        
+
         return new Promise<void>((resolve, reject) => {
             this.getMainAdminRoleId()
                 .then((role) => {
