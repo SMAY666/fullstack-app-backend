@@ -6,7 +6,7 @@ import passport from 'passport';
 
 import {DataBase, DataBaseConfig, MainAdminConfig} from './DataBase';
 import setPassportJwtStrategy from './middlewares/setPassportJwtStrategy';
-import {AuthRouter, EmploteeRouter, EventRouter, RoleRouter} from './routers';
+import {AuthRouter, CustomerRouter, EmploteeRouter, EventRouter, RoleRouter} from './routers';
 
 
 type AppConfig = {
@@ -53,6 +53,7 @@ export default class App {
         (new EmploteeRouter(this.expressApp));
         (new RoleRouter(this.expressApp));
         (new EventRouter(this.expressApp));
+        (new CustomerRouter(this.expressApp));
     }
 
     // -----[PUBLIC METHODS]-----

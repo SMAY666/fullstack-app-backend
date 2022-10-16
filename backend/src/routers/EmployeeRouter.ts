@@ -11,7 +11,7 @@ export default class EmploteeRouter {
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', this.delete.bind(this));
+            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
         expressApp.use('/api/employees', passport.authenticate('jwt', {session: false}), router);
     }
 

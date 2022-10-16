@@ -19,5 +19,8 @@ export class Customer extends BaseEntity {
     public email: string;
 
     @Column()
+    public description: string;
+
+    @Column()
     public documentsCount: number;
 }
