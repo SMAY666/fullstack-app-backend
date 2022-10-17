@@ -4,7 +4,7 @@ import passport from 'passport';
 import {Employee} from '../models';
 import {checkHttpRequestParameters, HttpErrorHandler, Password} from '../utils';
 
-export default class EmploteeRouter {
+export default class EmployeeRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/register', passport.authenticate('jwt', {session: false}), this.register.bind(this))
@@ -149,7 +149,6 @@ export default class EmploteeRouter {
             if (!checkHttpRequestParameters([
                 {value: id, type: 'number'}
             ], response)) {
-                HttpErrorHandler.invalidParameter(response);
                 return;
             }
 
