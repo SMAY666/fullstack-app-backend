@@ -1,3 +1,6 @@
+// eslint linebreak-style: ["error", "windows"]
+
+
 import {Router, Express, Response, Request} from 'express';
 import passport from 'passport';
 import {Customer} from '../models';
@@ -9,9 +12,9 @@ export default class CustomerRouter {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
-            .get('/customer/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this));
-            // .delete();
+            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this))
+            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
         expressApp.use('/api/customers', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -56,7 +59,7 @@ export default class CustomerRouter {
 
             response.status(201).json({message: 'Customer created successfully'});
 
-        } catch(error) {
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -73,7 +76,7 @@ export default class CustomerRouter {
             response.status(200).json(customers);
             return;
 
-        } catch(error) {
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -98,7 +101,7 @@ export default class CustomerRouter {
 
             response.status(200).json(customer);
 
-        } catch(error) {
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -109,7 +112,7 @@ export default class CustomerRouter {
             const {body: {id, fullName, phoneNumber, email, description, documentsCount}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number', optional: true},
+                {value: id, type: 'number'},
                 {value: fullName, type: 'string', optional: true},
                 {value: phoneNumber, type: 'string', optional: true},
                 {value: email, type: 'string', optional: true},
@@ -126,7 +129,6 @@ export default class CustomerRouter {
                 return;
             }
 
-
             const updated = {
                 fullName: request.body.fullName ?? customer.fullName,
                 phoneNumber: request.body.phoneNumber ?? customer.phoneNumber,
@@ -140,7 +142,33 @@ export default class CustomerRouter {
 
             response.status(200).json({message: 'Customer updated successfully'});
 
-        } catch(error) {
+        } catch (error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
+
+    private async delete(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {id}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: id, type: 'number'}
+            ], response)) {
+                return;
+            }
+
+            const customer = await Customer.findOneBy({id: +id});
+
+            if (!customer) {
+                HttpErrorHandler.userNotFound(response);
+                return;
+            }
+
+            await Customer.delete({id: request.body.id});
+            await Customer.save;
+
+            response.status(200).json({message: 'Customer deleted successfully'});
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }

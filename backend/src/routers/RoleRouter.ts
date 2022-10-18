@@ -1,3 +1,6 @@
+// eslint linebreak-style: ["error", "windows"]
+
+
 import {Express, Request, Response, Router} from 'express';
 import passport from 'passport';
 
@@ -25,7 +28,7 @@ export default class RoleRouter {
 
             if (!checkHttpRequestParameters([
                 {
-                    value: name, 
+                    value: name,
                     type: 'string',
                     condition: (value) => (value as string) != 'mainAdmin'
                 }
@@ -41,7 +44,7 @@ export default class RoleRouter {
 
             const newRole = await Role.create({name: request.body.name});
             newRole.save();
-            
+
             response.status(201).json({message: 'Role created successfull'});
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);

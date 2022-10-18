@@ -1,3 +1,4 @@
+// eslint linebreak-style: ["error", "windows"]
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 

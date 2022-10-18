@@ -1,3 +1,6 @@
+// eslint linebreak-style: ["error", "windows"]
+
+
 import {Router, Express, Response, Request} from 'express';
 import passport from 'passport';
 

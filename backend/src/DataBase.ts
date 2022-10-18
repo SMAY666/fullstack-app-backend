@@ -1,3 +1,5 @@
+// eslint linebreak-style: ["error", "windows"]
+
 import {DataSource} from 'typeorm';
 import {Password} from './utils';
 import {Role, Employee, Event, Customer, Document} from './models';

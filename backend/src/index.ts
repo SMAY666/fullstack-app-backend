@@ -1,3 +1,4 @@
+// eslint linebreak-style: ["error", "windows"]
 /* eslint-disable camelcase */
 
 import 'dotenv/config';
