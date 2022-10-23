@@ -1,17 +1,20 @@
+// eslint linebreak-style: ["error", "windows"]
+
+
 import {Router, Express, Response, Request} from 'express';
 import passport from 'passport';
 
 import {Employee} from '../models';
 import {checkHttpRequestParameters, HttpErrorHandler, Password} from '../utils';
 
-export default class EmploteeRouter {
+export default class EmployeeRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/register', passport.authenticate('jwt', {session: false}), this.register.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', this.delete.bind(this));
+            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
         expressApp.use('/api/employees', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -44,9 +47,12 @@ export default class EmploteeRouter {
                 {
                     value: email,
                     type: 'string',
-                    condition: (value: string) => !!value.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
+                    condition: (value) => !!(value as string).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
                 },
-                {value: passwordHash, type: 'string', condition: (value: string) => (value.length >= 6)}
+                {
+                    value: passwordHash, type: 'string',
+                    condition: (value) => ((value as string).length >= 6)
+                }
             ], response)) {
                 return;
             }
@@ -96,7 +102,7 @@ export default class EmploteeRouter {
                 return;
             }
             await Employee.delete({email: request.body.email});
-            
+
             await Employee.save;
 
             response.status(200).json({message: 'Employee deleted successfull'});
@@ -132,7 +138,7 @@ export default class EmploteeRouter {
             };
 
             await Employee.update({id: employee.id}, updated);
-            await Employee.save;            
+            await Employee.save;
             response.status(200).json({message: 'Employee updated sccess'});
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
@@ -146,7 +152,6 @@ export default class EmploteeRouter {
             if (!checkHttpRequestParameters([
                 {value: id, type: 'number'}
             ], response)) {
-                HttpErrorHandler.invalidParameter(response);
                 return;
             }
 
@@ -156,7 +161,7 @@ export default class EmploteeRouter {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
-            
+
             response.status(200).json(employee);
             return;
         } catch(error) {
@@ -177,5 +182,5 @@ export default class EmploteeRouter {
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
-    } 
+    }
 }

@@ -1,10 +1,12 @@
+// eslint linebreak-style: ["error", "windows"]
+
 import {Response} from 'express';
 
 export default abstract class HttpErrorHandler {
 
     // -----[PUBLIC STATIC METHODS]-----
 
-    /* -----Users erroers-----*/
+    /* -----Users errors-----*/
 
     public static missingParameters(response: Response): void {
         response.status(400).json({message: 'One or more required parameters are missing'});
@@ -28,7 +30,7 @@ export default abstract class HttpErrorHandler {
 
     public static internalServer(response: Response, error: Error | unknown): void {
         response.status(500).json({
-            message: `An internal server error has occurred: 
+            message: `An internal server error has occurred:
         ${(error instanceof Error) ? error.message : error}`
         });
     }
@@ -51,12 +53,17 @@ export default abstract class HttpErrorHandler {
 
     /* -----Events table errors-----*/
 
-    
+
     public static emptyEventList(response: Response): void {
         response.status(404).json({message: 'Event list is empty'});
     }
 
     public static eventNotFound(response: Response): void {
         response.status(404).json({message: 'Event not found'});
+    }
+
+    /* -----Documents error-----*/
+    public static documentNotFound(response: Response): void {
+        response.status(404).json({message: 'Document not found'});
     }
 }
