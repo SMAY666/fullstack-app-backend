@@ -110,8 +110,8 @@ export class DataBase {
                         });
                         newMainAdmin.save()
                             .then(() => resolve())
-                            .catch((error) => reject(new Error(`Failed to create main admin account:
-                            ${error.message}`)));
+                            .catch((error) => reject(
+                                new Error(`Failed to create main admin account: ${error.message}`)));
                     }
                 });
         });

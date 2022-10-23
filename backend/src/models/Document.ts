@@ -15,14 +15,14 @@ export class Document extends BaseEntity {
     @Column()
     public type: string;
 
-    @ManyToOne(() => Customer, (customer) => customer.id)
-    public customer: Customer;
-
     @Column()
     public title: string;
 
     @Column()
     public description: string;
+
+    @ManyToOne(() => Customer, (customer) => customer.id)
+    public customer: Customer;
 
     @Column({type: 'date'})
     public dateOfBegin: string;

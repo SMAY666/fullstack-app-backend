@@ -21,13 +21,9 @@ export default class EventRouter {
     // -----[PRIVATE METHODS]-----
 
     private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
-        if (new Date(dateOfTheBegining) >= new Date() &&
+        return new Date(dateOfTheBegining) >= new Date() &&
             new Date(dateOfTheEnd) >= new Date() &&
-            new Date(dateOfTheBegining) <= new Date(dateOfTheEnd)) {
-            return true;
-        } else {
-            return false;
-        }
+            new Date(dateOfTheBegining) <= new Date(dateOfTheEnd);
     }
 
     private async create(request: Request, response: Response): Promise<void> {
