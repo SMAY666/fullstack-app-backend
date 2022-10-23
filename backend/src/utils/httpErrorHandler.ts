@@ -61,4 +61,9 @@ export default abstract class HttpErrorHandler {
     public static eventNotFound(response: Response): void {
         response.status(404).json({message: 'Event not found'});
     }
+
+    /* -----Documents error-----*/
+    public static documentNotFound(response: Response): void {
+        response.status(404).json({message: 'Document not found'});
+    }
 }

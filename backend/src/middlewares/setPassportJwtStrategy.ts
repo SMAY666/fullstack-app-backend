@@ -17,10 +17,12 @@ export default (passport: PassportStatic, secretOrKey: string): PassportStatic =
                 if (emplyee) {
                     done(null, emplyee);
                 } else {
+                    // @ts-ignore
                     done(emplyee, null);
                 }
             })
             .catch((error) => {
+                // @ts-ignore
                 done(error, null);
             });
     });

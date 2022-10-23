@@ -16,7 +16,7 @@ export class Customer extends BaseEntity {
     @Column()
     public phoneNumber: string;
 
-    @Column()
+    @Column({unique: true})
     public email: string;
 
     @Column()

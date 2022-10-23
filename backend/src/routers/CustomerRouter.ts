@@ -20,8 +20,7 @@ export default class CustomerRouter {
 
 
     // -----[PRIVATE METHODS]-----
-
-
+    
     private async create(request: Request, response: Response): Promise<void> {
         try {
             const {body: {fullName, phoneNumber, email, description}} = request;
@@ -117,7 +116,7 @@ export default class CustomerRouter {
                 {value: phoneNumber, type: 'string', optional: true},
                 {value: email, type: 'string', optional: true},
                 {value: description, type: 'string', optional: true},
-                {value: documentsCount, type: 'number', optional: true}
+                {value: documentsCount, type: 'number', optional: true} // Should resolve this
             ], response)) {
                 return;
             }
@@ -134,7 +133,7 @@ export default class CustomerRouter {
                 phoneNumber: request.body.phoneNumber ?? customer.phoneNumber,
                 email: request.body.email ?? customer.email,
                 description: request.body.description ?? customer.description,
-                documentsCount: request.body.documentsCount ?? customer.documentsCount
+                documentsCount: request.body.documents ?? customer.documentsCount
             };
 
             await Customer.update({id: customer.id}, updated);
