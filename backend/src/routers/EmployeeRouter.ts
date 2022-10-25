@@ -86,22 +86,22 @@ export default class EmployeeRouter {
 
     private async delete(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {email}} = request;
+            const {body: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: email, type: 'string'}
+                {value: id, type: 'number'}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
                 return;
             }
 
-            const candidate = await Employee.findOneBy({email});
+            const candidate = await Employee.findOneBy({id: +id});
 
             if (!candidate) {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
-            await Employee.delete({email: request.body.email});
+            await Employee.delete({id: +id});
 
             await Employee.save;
 

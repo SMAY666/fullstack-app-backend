@@ -53,6 +53,7 @@ export default class DocumentRouter {
 
             await document.save();
             customer.documentsCount += 1;
+            await customer.save();
 
             response.status(201).json({message: 'Document created successfully'});
 
@@ -163,6 +164,9 @@ export default class DocumentRouter {
                 HttpErrorHandler.documentNotFound(response);
                 return;
             }
+
+            document.customer.documentsCount -= 1;
+            await Customer.save;
 
             await Document.delete({id: +id});
             await Document.save;
