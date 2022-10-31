@@ -3,7 +3,7 @@
 
 import {Router, Express, Response, Request} from 'express';
 import passport from 'passport';
-import {checkHttpRequestParameters, HttpErrorHandler} from '../utils';
+import {checkHttpRequestParameters, HttpErrorHandler, Mailer} from '../utils';
 import {Customer, Document} from '../models';
 
 
@@ -53,7 +53,10 @@ export default class DocumentRouter {
 
             await document.save();
             customer.documentsCount += 1;
+
             await customer.save();
+
+            await Mailer.sendMail('Document created', `Document ${document.title} was created`);
 
             response.status(201).json({message: 'Document created successfully'});
 
@@ -142,6 +145,9 @@ export default class DocumentRouter {
             await Document.update({id: +id}, updated);
             await Document.save;
 
+            await Mailer.sendMail('Document updated', `Document ${document.title} was updated`);
+
+
             response.status(200).json({message: 'Document updated successfully'});
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
@@ -165,11 +171,24 @@ export default class DocumentRouter {
                 return;
             }
 
-            document.customer.documentsCount -= 1;
-            await Customer.save;
+            const documentTitle = document?.title;
+
+            const customerId = document.customer.id;
+
+            const customer = await Customer.findOneBy({id: +customerId});
+
+            if (!customer) {
+                HttpErrorHandler.userNotFound(response);
+                return;
+            }
 
             await Document.delete({id: +id});
+            customer.documentsCount -= 1;
+
             await Document.save;
+            await customer.save();
+
+            await Mailer.sendMail('Document deleted', `Document ${documentTitle} was deleted`);
 
             response.status(200).json({message: 'Document deleted successfully'});
 
