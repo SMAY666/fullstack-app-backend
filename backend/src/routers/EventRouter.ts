@@ -21,9 +21,19 @@ export default class EventRouter {
     // -----[PRIVATE METHODS]-----
 
     private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
-        return new Date(dateOfTheBegining) >= new Date() &&
-            new Date(dateOfTheEnd) >= new Date() &&
-            new Date(dateOfTheBegining) <= new Date(dateOfTheEnd);
+        const dateNow = new Date();
+
+        const today = dateNow.getDate() < 10 ? '0' + dateNow.getDate() + '.' + (dateNow.getMonth() - -1) + '.' + dateNow.getFullYear() : dateNow.getDate() + '.' + (dateNow.getMonth() - -1) + '.' + dateNow.getFullYear();
+        if (
+            new Date(dateOfTheBegining) > new Date(dateOfTheEnd) ||
+            new Date(dateOfTheBegining) < new Date(today) ||
+            new Date(dateOfTheEnd) < new Date(today)
+        ) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     private async create(request: Request, response: Response): Promise<void> {
@@ -52,10 +62,12 @@ export default class EventRouter {
                 return;
             }
 
+
             await Event.save(newEvent);
 
             response.status(201).json({message: 'Event created successfull'});
         } catch(error) {
+            console.log(error);
             HttpErrorHandler.internalServer(response, error);
         }
     }

@@ -1,6 +1,6 @@
 {
-  "name": "fullstack-app-monorepo",
-  "version": "0.3.1",
+  "name": "fullstack-app-backend",
+  "version": "0.3.2",
   "scripts": {
     "start": "lerna run start",
     "build": "lerna run build",
