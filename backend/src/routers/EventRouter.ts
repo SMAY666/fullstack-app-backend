@@ -1,4 +1,4 @@
-import {Express, Router, Request, Response} from 'express';
+import {Express, Router, Request, Response, query} from 'express';
 import passport from 'passport';
 
 import {checkHttpRequestParameters, HttpErrorHandler} from '../utils';
@@ -9,7 +9,7 @@ export default class EventRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
-            .get('/search=:searchValue', passport.authenticate('jwt', {session: false}), this.searchEvent.bind(this))
+            .get('/search', passport.authenticate('jwt', {session: false}), this.searchEvent.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
@@ -22,19 +22,22 @@ export default class EventRouter {
 
     private async searchEvent(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {searchValue}} = request;
+            const {query: {value}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: searchValue, type: 'string'}
+                {value: value as string, type: 'string'}
             ], response)) {
                 return;
             }
 
+            console.log(request.params);
+            console.log(request.query);
+
             const events = await Event.query(
                 `SELECT * FROM events WHERE
-                       LOWER(title) LIKE LOWER('%${searchValue}%')
-                       OR LOWER(description) LIKE LOWER('%${searchValue}%')
-                       OR LOWER(status) LIKE LOWER('%${searchValue}%')`
+                       LOWER(title) LIKE LOWER('%${value}%')
+                       OR LOWER(description) LIKE LOWER('%${value}%')
+                       OR LOWER(status) LIKE LOWER('%${value}%')`
             );
 
             if (events.length === 0) {
