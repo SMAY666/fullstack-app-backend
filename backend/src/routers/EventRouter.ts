@@ -9,16 +9,44 @@ export default class EventRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
+            .get('/search=:searchValue', passport.authenticate('jwt', {session: false}), this.searchEvent.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
             .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
-
         expressApp.use('/api/events', passport.authenticate('jwt', {session: false}), router);
     }
 
 
     // -----[PRIVATE METHODS]-----
+
+    private async searchEvent(request: Request, response: Response): Promise<void> {
+        try {
+            const {body: {searchValue}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: searchValue, type: 'string'}
+            ], response)) {
+                return;
+            }
+
+            const events = await Event.query(
+                `SELECT * FROM events WHERE
+                       LOWER(title) LIKE LOWER('%${searchValue}%')
+                       OR LOWER(description) LIKE LOWER('%${searchValue}%')
+                       OR LOWER(status) LIKE LOWER('%${searchValue}%')`
+            );
+
+            if (events.length === 0) {
+                HttpErrorHandler.eventNotFound(response);
+                return;
+            }
+
+            response.status(200).json(events);
+        } catch (error) {
+            HttpErrorHandler.internalServer(response, error);
+        }
+    }
 
     private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
         const dateNow = new Date();
