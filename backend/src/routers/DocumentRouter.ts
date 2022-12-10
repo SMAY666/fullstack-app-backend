@@ -12,9 +12,10 @@ export default class DocumentRouter {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
-            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
+            .get('/document', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .delete('/delete', passport.authenticate('jwt', {session: false}), this.delete.bind(this))
+            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this));
+
         expressApp.use('/api/documents', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -84,13 +85,18 @@ export default class DocumentRouter {
 
     private async getById(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
                 return;
             }
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
+                return;
+            }
+
             const document = await Document.findOneBy({id: +id});
 
             if (!document) {
@@ -156,11 +162,16 @@ export default class DocumentRouter {
 
     private async delete(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
+                return;
+            }
+
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
                 return;
             }
 

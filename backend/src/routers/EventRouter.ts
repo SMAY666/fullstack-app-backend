@@ -11,9 +11,9 @@ export default class EventRouter {
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
             .get('/search', passport.authenticate('jwt', {session: false}), this.searchEvent.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
-            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
+            .get('/event', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .delete('/delete', passport.authenticate('jwt', {session: false}), this.delete.bind(this))
+            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this));
         expressApp.use('/api/events', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -29,9 +29,6 @@ export default class EventRouter {
             ], response)) {
                 return;
             }
-
-            console.log(request.params);
-            console.log(request.query);
 
             const events = await Event.query(
                 `SELECT * FROM events WHERE
@@ -120,12 +117,16 @@ export default class EventRouter {
 
     private async getById(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
                 return;
             }
 
@@ -179,7 +180,12 @@ export default class EventRouter {
 
     private async delete(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
+
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
+                return
+            }
 
             const event = await Event.findOneBy({id: +id});
 

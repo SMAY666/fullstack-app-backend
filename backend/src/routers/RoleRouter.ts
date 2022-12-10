@@ -14,8 +14,8 @@ export default class RoleRouter {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
-            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
+            .get('/role', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .delete('/delete', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
         expressApp.use('/api/roles', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -53,15 +53,20 @@ export default class RoleRouter {
 
     private async delete(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
                 return;
             }
 
-            const role = await Role.findOneBy({id: request.body.id});
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
+                return;
+            }
+
+            const role = await Role.findOneBy({id: +id});
 
             if (!role) {
                 HttpErrorHandler.roleNotFound(response);
@@ -82,12 +87,17 @@ export default class RoleRouter {
 
     private async getById(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
+                return;
+            }
+
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
                 return;
             }
 

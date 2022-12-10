@@ -12,9 +12,9 @@ export default class EmployeeRouter {
         const router = Router()
             .post('/register', passport.authenticate('jwt', {session: false}), this.register.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
-            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
+            .get('/employee', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .delete('/delete', passport.authenticate('jwt', {session: false}), this.delete.bind(this))
+            .patch('/:id', passport.authenticate('jwt', {session: false}), this.update.bind(this));
         expressApp.use('/api/employees', passport.authenticate('jwt', {session: false}), router);
     }
 
@@ -86,15 +86,18 @@ export default class EmployeeRouter {
 
     private async delete(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
                 return;
             }
-
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
+                return;
+            }
             const candidate = await Employee.findOneBy({id: +id});
 
             if (!candidate) {
@@ -147,11 +150,16 @@ export default class EmployeeRouter {
 
     private async getById(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
+                return;
+            }
+
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
                 return;
             }
 
