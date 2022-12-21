@@ -14,15 +14,15 @@ File .env at the root of the project.'
 NODE_ENV=<string>
 PORT=<number> // devDefault: 5000, default: 80
 MORGAN_FORMAT=<string> // devDefault: 'dev', default: 'common'
-_SECRET_OR_KEY=<string>
-_EXPIRATION_TIME=<string> // default: '12h'
-_USERNAME=<string> // default: 'postgres'
-_PASSWORD=<string>
-_HOST=<string> // devDefault: 'localhost'
-_PORT=<number> // default: 5432
-_NAME=<string> // default: 'register_of_citizens'
-_ADMIN_LOGIN=<string> // devDefault: 'admin'
-_ADMIN_PASSWORD=<string> // devDefault: 'admin'
+SECRET_OR_KEY=<string>
+EXPIRATION_TIME=<string> // default: '12h'
+USERNAME=<string> // default: 'postgres'
+PASSWORD=<string>
+HOST=<string> // devDefault: 'localhost'
+PORT=<number> // default: 5432
+NAME=<string> // default: 'register_of_citizens'
+ADMIN_LOGIN=<string> // devDefault: 'admin'
+ADMIN_PASSWORD=<string> // devDefault: 'admin'
 ~~~
 
 ## Scripts
