@@ -1,7 +1,7 @@
-import {Express, Router, Request, Response, query} from 'express';
+import {Express, Router, Request, Response} from 'express';
 import passport from 'passport';
 
-import {checkHttpRequestParameters, HttpErrorHandler} from '../utils';
+import {checkHttpRequestParameters, HttpErrorHandler, isValidDateEnd} from '../utils';
 import {Event} from '../models';
 
 
@@ -37,65 +37,42 @@ export default class EventRouter {
                        OR LOWER(status) LIKE LOWER('%${value}%')`
             );
 
-            if (events.length === 0) {
-                HttpErrorHandler.eventNotFound(response);
-                return;
-            }
-
             response.status(200).json(events);
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
 
-    private checkDateValue(dateOfTheBegining: string, dateOfTheEnd: string): boolean {
-        const dateNow = new Date();
-
-        const today = dateNow.getDate() < 10 ? '0' + dateNow.getDate() + '.' + (dateNow.getMonth() - -1) + '.' + dateNow.getFullYear() : dateNow.getDate() + '.' + (dateNow.getMonth() - -1) + '.' + dateNow.getFullYear();
-        if (
-            new Date(dateOfTheBegining) > new Date(dateOfTheEnd) ||
-            new Date(dateOfTheBegining) < new Date(today) ||
-            new Date(dateOfTheEnd) < new Date(today)
-        ) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-
     private async create(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {title, description, dateOfTheBegining, dateOfTheEnd}} = request;
+            const {body: {title, description, dateBegin, dateEnd}} = request;
 
             if (!checkHttpRequestParameters([
                 {value: title, type: 'string'},
                 {value: description, type: 'string'},
-                {value: dateOfTheBegining, type: 'string'},
-                {value: dateOfTheEnd, type: 'string'}
+                {value: dateBegin, type: 'number'},
+                {value: dateEnd, type: 'number'}
             ], response)) {
                 return;
             }
 
             const newEvent = await Event.create({
-                title: request.body.title,
-                description: request.body.description,
-                dateOfTheBegining: request.body.dateOfTheBegining,
-                dateOfTheEnd: request.body.dateOfTheEnd,
+                title,
+                description,
+                dateBegin: new Date(request.body.dateBegin),
+                dateEnd: new Date(request.body.dateEnd),
                 status: 'Open'
             });
 
-            if (!this.checkDateValue(newEvent.dateOfTheBegining, newEvent.dateOfTheEnd)) {
+            if (!isValidDateEnd(newEvent.dateBegin, newEvent.dateEnd)) {
                 HttpErrorHandler.invalidParameter(response);
                 return;
             }
 
-
             await Event.save(newEvent);
 
             response.status(201).json({message: 'Event created successfull'});
-        } catch(error) {
-            console.log(error);
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -110,7 +87,7 @@ export default class EventRouter {
             }
 
             response.status(200).json(events);
-        } catch(error) {
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -138,7 +115,7 @@ export default class EventRouter {
             }
 
             response.status(200).json(event);
-        } catch(error) {
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
@@ -169,7 +146,6 @@ export default class EventRouter {
             };
 
             await Event.update({id: +id}, updated);
-            await Event.save;
 
             response.status(200).json({message: 'Event edit successfull'});
 
@@ -184,7 +160,7 @@ export default class EventRouter {
 
             if (!id) {
                 HttpErrorHandler.missingParameters(response);
-                return
+                return;
             }
 
             const event = await Event.findOneBy({id: +id});
@@ -195,10 +171,9 @@ export default class EventRouter {
             }
 
             await Event.delete({id: +id});
-            await Event.save;
 
             response.status(200).json({message: 'Event deleted successfull'});
-        } catch(error) {
+        } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
     }
