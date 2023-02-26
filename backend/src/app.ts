@@ -14,7 +14,7 @@ type AppConfig = {
     morganFormat: string;
     jwt: {
         secretOrKey: string;
-        expirationTime: string;
+        expirationTime: number;
     }
 }
 

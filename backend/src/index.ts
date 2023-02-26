@@ -4,7 +4,7 @@
 import 'dotenv/config';
 import App from './app';
 
-import {cleanEnv, port, str, host} from 'envalid';
+import {cleanEnv, port, str, host, num} from 'envalid';
 
 
 const env = cleanEnv(process.env, {
@@ -15,7 +15,7 @@ const env = cleanEnv(process.env, {
         docs: 'https://www.npmjs.com/package/morgan'
     }),
     JWT_SECRET_OR_KEY: str(),
-    JWT_EXPIRATION_TIME: str({default: '1d'}),
+    JWT_EXPIRATION_TIME: num({default: 3600000}),
     DB_USERNAME: str({default: 'postgres'}),
     DB_PASSWORD: str(),
     DB_HOST: host({default: 'localhost'}),

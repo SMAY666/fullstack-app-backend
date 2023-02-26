@@ -6,7 +6,7 @@ import {checkHttpRequestParameters, Password, HttpErrorHandler} from '../utils';
 
 type AuthRouterOptions = {
     secretOrKey: string
-    expirationTime: string
+    expirationTime: number
 }
 
 export default class AuthRouter {
@@ -48,8 +48,11 @@ export default class AuthRouter {
                 this.options.secretOrKey,
                 {expiresIn: this.options.expirationTime}
             );
-            
-            response.status(200).json(token);
+
+            response.status(200).json({
+                token,
+                expirationTime: Date.now() + this.options.expirationTime
+            });
 
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
