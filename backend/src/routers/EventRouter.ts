@@ -1,4 +1,5 @@
 import {Express, Router, Request, Response} from 'express';
+import {ILike, MoreThanOrEqual, LessThanOrEqual} from 'typeorm';
 import passport from 'passport';
 
 import {checkHttpRequestParameters, HttpErrorHandler, isValidDateEnd} from '../utils';
@@ -22,19 +23,43 @@ export default class EventRouter {
 
     private async searchEvent(request: Request, response: Response): Promise<void> {
         try {
-            const {query: {value}} = request;
+            const {query: {value, dateFrom, dateTo, status}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: value as string, type: 'string'}
+                {value: value as string, type: 'string'},
+                {value: dateFrom as string, type: 'string'},
+                {value: dateTo as string, type: 'string'},
+                {value: status as string, type: 'string'}
+
             ], response)) {
                 return;
             }
 
-            const events = await Event.query(
-                `SELECT * FROM events WHERE
-                       LOWER(title) LIKE LOWER('%${value}%')
-                       OR LOWER(description) LIKE LOWER('%${value}%')
-                       OR LOWER(status) LIKE LOWER('%${value}%')`
+            const events = await Event.find(
+                {
+                    where: [
+                        {
+                            title: ILike(`%${value}%`),
+                            dateBegin: dateFrom !== undefined && dateFrom.length !== 0
+                                ? MoreThanOrEqual(new Date(dateFrom.toString()))
+                                : MoreThanOrEqual(new Date('1970-01-01')),
+                            dateEnd: dateTo !== undefined && dateTo.length !== 0
+                                ? LessThanOrEqual(new Date(dateTo.toString()))
+                                : LessThanOrEqual(new Date('2100-01-01'))
+                            // status: status !== 'Any' ? `%${status}%` : '%*%'
+                        },
+                        {
+                            description: ILike(`%${value}%`),
+                            dateBegin: dateFrom !== undefined && dateFrom.length !== 0
+                                ? MoreThanOrEqual(new Date(dateFrom.toString()))
+                                : MoreThanOrEqual(new Date('1970-01-01')),
+                            dateEnd: dateTo !== undefined && dateTo.length !== 0
+                                ? LessThanOrEqual(new Date(dateTo.toString()))
+                                : LessThanOrEqual(new Date('2100-01-01'))
+                        }
+                    ]
+
+                }
             );
 
             response.status(200).json(events);
