@@ -10,7 +10,6 @@ export default class EventRouter {
     constructor(expressApp: Express) {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
-            .get('/search', passport.authenticate('jwt', {session: false}), this.searchEvent.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
             .get('/event', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
             .delete('/delete', passport.authenticate('jwt', {session: false}), this.delete.bind(this))
@@ -20,47 +19,6 @@ export default class EventRouter {
 
 
     // -----[PRIVATE METHODS]-----
-
-    private async searchEvent(request: Request, response: Response): Promise<void> {
-        try {
-            const {query: {value, dateFrom, dateTo, status}} = request;
-
-            if (!checkHttpRequestParameters([
-                {value: value as string, type: 'string'},
-                {value: dateFrom as string, type: 'string'},
-                {value: dateTo as string, type: 'string'},
-                {value: status as string, type: 'string'}
-
-            ], response)) {
-                return;
-            }
-            console.log('value:', !!value);
-            const events = await Event.find(
-                {
-                    where: [
-                        {
-                            title: ILike(`%${value}%`),
-                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
-                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
-                            ...(status ? {status: status.toString()} : {})
-                        },
-                        {
-                            description: ILike(`%${value}%`),
-                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
-                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
-                            ...(status ? {status: status.toString()} : {})
-                        }
-                    ]
-
-                }
-            );
-            console.log(events[0]?.status);
-
-            response.status(200).json(events);
-        } catch (error) {
-            HttpErrorHandler.internalServer(response, error);
-        }
-    }
 
     private async create(request: Request, response: Response): Promise<void> {
         try {
@@ -98,12 +56,36 @@ export default class EventRouter {
 
     private async getAll(request: Request, response: Response): Promise<void> {
         try {
-            const events = await Event.find();
+            const {query: {value, dateFrom, dateTo, status}} = request;
 
-            if (!await Event.count()) {
-                HttpErrorHandler.emptyEventList(response);
+            if (!checkHttpRequestParameters([
+                {value: value as string, type: 'string'},
+                {value: dateFrom as string, type: 'string'},
+                {value: dateTo as string, type: 'string'},
+                {value: status as string, type: 'string'}
+
+            ], response)) {
                 return;
             }
+            const events = await Event.find(
+                {
+                    where: [
+                        {
+                            title: ILike(`%${value}%`),
+                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
+                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
+                            ...(status ? {status: status.toString()} : {})
+                        },
+                        {
+                            description: ILike(`%${value}%`),
+                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
+                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
+                            ...(status ? {status: status.toString()} : {})
+                        }
+                    ]
+
+                }
+            );
 
             response.status(200).json(events);
         } catch (error) {
