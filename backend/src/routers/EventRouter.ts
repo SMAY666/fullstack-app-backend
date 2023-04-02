@@ -34,33 +34,27 @@ export default class EventRouter {
             ], response)) {
                 return;
             }
-
+            console.log('value:', !!value);
             const events = await Event.find(
                 {
                     where: [
                         {
                             title: ILike(`%${value}%`),
-                            dateBegin: dateFrom !== undefined && dateFrom.length !== 0
-                                ? MoreThanOrEqual(new Date(dateFrom.toString()))
-                                : MoreThanOrEqual(new Date('1970-01-01')),
-                            dateEnd: dateTo !== undefined && dateTo.length !== 0
-                                ? LessThanOrEqual(new Date(dateTo.toString()))
-                                : LessThanOrEqual(new Date('2100-01-01'))
-                            // status: status !== 'Any' ? `%${status}%` : '%*%'
+                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
+                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
+                            ...(status ? {status: status.toString()} : {})
                         },
                         {
                             description: ILike(`%${value}%`),
-                            dateBegin: dateFrom !== undefined && dateFrom.length !== 0
-                                ? MoreThanOrEqual(new Date(dateFrom.toString()))
-                                : MoreThanOrEqual(new Date('1970-01-01')),
-                            dateEnd: dateTo !== undefined && dateTo.length !== 0
-                                ? LessThanOrEqual(new Date(dateTo.toString()))
-                                : LessThanOrEqual(new Date('2100-01-01'))
+                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
+                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
+                            ...(status ? {status: status.toString()} : {})
                         }
                     ]
 
                 }
             );
+            console.log(events[0]?.status);
 
             response.status(200).json(events);
         } catch (error) {
