@@ -67,24 +67,23 @@ export default class EventRouter {
             ], response)) {
                 return;
             }
-            const events = await Event.find(
-                {
-                    where: [
-                        {
-                            title: ILike(`%${value}%`),
-                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
-                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
-                            ...(status ? {status: status.toString()} : {})
-                        },
-                        {
-                            description: ILike(`%${value}%`),
-                            ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
-                            ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
-                            ...(status ? {status: status.toString()} : {})
-                        }
-                    ]
+            const events = await Event.find({
+                order: {dateBegin: 'ASC'},
+                where: [
+                    {
+                        title: ILike(`%${value}%`),
+                        ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
+                        ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
+                        ...(status ? {status: status.toString()} : {})
+                    },
+                    {
+                        description: ILike(`%${value}%`),
+                        ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
+                        ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
+                        ...(status ? {status: status.toString()} : {})
+                    }]
 
-                }
+            }
             );
 
             response.status(200).json(events);
@@ -123,11 +122,14 @@ export default class EventRouter {
 
     private async update(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id, description, status}} = request;
+            const {body: {id, title, description, dateBegin, dateEnd, status}} = request;
 
             if (!checkHttpRequestParameters([
                 {value: id, type: 'number'},
+                {value: title, type: 'string', optional: true},
                 {value: description, type: 'string', optional: true},
+                {value: dateBegin, type: 'string', optional: true},
+                {value: dateEnd, type: 'string', optional: true},
                 {value: status, type: 'string', optional: true}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
@@ -142,8 +144,11 @@ export default class EventRouter {
             }
 
             const updated = {
+                title: request.body.title ?? event.title,
                 description: request.body.description ?? event.description,
-                status: request.body.status ?? event.status
+                dateBegin: request.body.dateBegin ?? event.dateBegin,
+                dateEnd: request.body.dateEnd ?? event.dateEnd,
+                status: request.body.status
             };
 
             await Event.update({id: +id}, updated);

@@ -1,6 +1,6 @@
 {
   "name": "fullstack-app-backend",
-  "version": "0.4.2",
+  "version": "0.5.2",
   "scripts": {
     "start": "lerna run start",
     "build": "lerna run build",
