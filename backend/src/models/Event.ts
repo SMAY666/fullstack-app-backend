@@ -13,12 +13,12 @@ export class Event extends BaseEntity {
 
     @Column()
     public description: string;
-    
-    @ Column({type: 'date'})
-    public dateOfTheBegining: string;
 
-    @Column({type: 'date'})
-    public dateOfTheEnd: string;
+    @ Column({type: 'timestamptz'})
+    public dateBegin: Date;
+
+    @Column({type: 'timestamptz'})
+    public dateEnd: Date;
 
     @Column()
     public status: string; // Open / Close

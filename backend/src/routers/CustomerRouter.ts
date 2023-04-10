@@ -1,7 +1,7 @@
 // eslint linebreak-style: ["error", "windows"]
 
 
-import {Router, Express, Response, Request} from 'express';
+import {Router, Express, Response, Request, query} from 'express';
 import passport from 'passport';
 import {Customer} from '../models';
 import {checkHttpRequestParameters, HttpErrorHandler} from '../utils';
@@ -12,15 +12,15 @@ export default class CustomerRouter {
         const router = Router()
             .post('/create', passport.authenticate('jwt', {session: false}), this.create.bind(this))
             .get('/', passport.authenticate('jwt', {session: false}), this.getAll.bind(this))
-            .get('/:id', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
-            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this))
-            .delete('/:id', passport.authenticate('jwt', {session: false}), this.delete.bind(this));
+            .get('/customer', passport.authenticate('jwt', {session: false}), this.getById.bind(this))
+            .delete('/delete', passport.authenticate('jwt', {session: false}), this.delete.bind(this))
+            .patch('/:id/update', passport.authenticate('jwt', {session: false}), this.update.bind(this));
         expressApp.use('/api/customers', passport.authenticate('jwt', {session: false}), router);
     }
 
 
     // -----[PRIVATE METHODS]-----
-    
+
     private async create(request: Request, response: Response): Promise<void> {
         try {
             const {body: {fullName, phoneNumber, email, description}} = request;
@@ -82,16 +82,19 @@ export default class CustomerRouter {
 
     private async getById(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
+                return;
+            }
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
                 return;
             }
 
             const customer = await Customer.findOneBy({id: +id});
-
 
             if (!customer) {
                 HttpErrorHandler.userNotFound(response);
@@ -148,11 +151,16 @@ export default class CustomerRouter {
 
     private async delete(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id}} = request;
+            const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'}
+                {value: id as string, type: 'number'}
             ], response)) {
+                return;
+            }
+
+            if (!id) {
+                HttpErrorHandler.missingParameters(response);
                 return;
             }
 
