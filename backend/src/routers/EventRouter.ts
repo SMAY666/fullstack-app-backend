@@ -48,7 +48,7 @@ export default class EventRouter {
 
             await Event.save(newEvent);
 
-            response.status(201).json({message: 'Event created successfull'});
+            response.status(201).json({message: 'Event created successful'});
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
@@ -148,7 +148,7 @@ export default class EventRouter {
 
             await Event.update({id: +id}, updated);
 
-            response.status(200).json({message: 'Event edit successfull'});
+            response.status(200).json({message: 'Event edit successful'});
 
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
@@ -173,7 +173,7 @@ export default class EventRouter {
 
             await Event.delete({id: +id});
 
-            response.status(200).json({message: 'Event deleted successfull'});
+            response.status(200).json({message: 'Event deleted successful'});
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
         }
