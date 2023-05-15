@@ -70,6 +70,7 @@ export default class EventRouter {
             const events = await Event.find({
                 order: {dateBegin: 'ASC'},
                 where: [
+                    // TODO: Сделать дату в локальном часовом поясе
                     {
                         title: ILike(`%${value}%`),
                         ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),

@@ -153,7 +153,7 @@ export default class EmployeeRouter {
             const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id as string, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
                 return;
             }
@@ -170,6 +170,8 @@ export default class EmployeeRouter {
                 return;
             }
 
+            console.log(employee);
+
             response.status(200).json(employee);
             return;
         } catch(error) {
@@ -179,12 +181,17 @@ export default class EmployeeRouter {
 
     private async getAll(request: Request, response: Response): Promise<void> {
         try {
-            const employees = await Employee.find();
+            const employees = await Employee.find(
+                {
+                    relations: {role: true}
+                }
+            );
 
             if (!await Employee.count()) {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
+            console.log(employees);
             response.status(200).json(employees);
             return;
         } catch(error) {

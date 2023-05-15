@@ -56,7 +56,7 @@ export default class RoleRouter {
             const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id as string, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
                 return;
             }
@@ -71,12 +71,13 @@ export default class RoleRouter {
             if (!role) {
                 HttpErrorHandler.roleNotFound(response);
                 return;
-            } else if (role.name == 'mainAdmin') {
+            }
+            if (role.name == 'mainAdmin') {
                 HttpErrorHandler.noAccess(response);
                 return;
             }
 
-            await Role.delete({id: request.body.id});
+            await Role.delete({id: +id});
             await Role.save;
 
             response.status(200).json({message: 'Role deleted succeessfull'});
@@ -90,9 +91,8 @@ export default class RoleRouter {
             const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id as string, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
-                HttpErrorHandler.invalidParameter(response);
                 return;
             }
 
@@ -105,6 +105,7 @@ export default class RoleRouter {
 
             if (!role) {
                 HttpErrorHandler.roleNotFound(response);
+                return;
             }
 
             response.status(200).json(role);
