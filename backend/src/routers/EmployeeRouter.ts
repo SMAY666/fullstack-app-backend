@@ -64,7 +64,7 @@ export default class EmployeeRouter {
                 return;
             }
 
-            const emplyee = await Employee.create({
+            const employee = await Employee.create({
                 firstName: request.body.firstName,
                 middleName: request.body.middleName,
                 lastName: request.body.lastName,
@@ -75,7 +75,7 @@ export default class EmployeeRouter {
                 email: request.body.email,
                 passwordHash: Password.calculateHash(passwordHash)
             });
-            emplyee.save();
+            employee.save();
 
             response.status(201).json({message: 'Employee created succsessfull'});
             return;
@@ -89,9 +89,8 @@ export default class EmployeeRouter {
             const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id as string, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
-                HttpErrorHandler.invalidParameter(response);
                 return;
             }
             if (!id) {
@@ -104,11 +103,12 @@ export default class EmployeeRouter {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
+
             await Employee.delete({id: +id});
 
             await Employee.save;
 
-            response.status(200).json({message: 'Employee deleted successfull'});
+            response.status(200).json({message: 'Employee deleted successful'});
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
         }
@@ -116,13 +116,14 @@ export default class EmployeeRouter {
 
     private async update(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id, post, roleId, salary}} = request;
+            const {body: {id, post, roleId, salary, description}} = request;
 
             if (!checkHttpRequestParameters([
                 {value: id, type: 'number'},
                 {value: post, type: 'string', optional: true},
                 {value: roleId, type: 'number', optional: true},
-                {value: salary, type: 'number', optional: true}
+                {value: salary, type: 'number', optional: true},
+                {value: description, type: 'string', optional: true}
             ], response)) {
                 HttpErrorHandler.invalidParameter(response);
             }
@@ -137,7 +138,8 @@ export default class EmployeeRouter {
             const updated = {
                 post: request.body.post ?? employee.post,
                 role: {id: request.body.roleId ?? employee.role.id},
-                salary: request.body.salary ?? employee.salary
+                salary: request.body.salary ?? employee.salary,
+                description: request.body.description ?? employee.description
             };
 
             await Employee.update({id: employee.id}, updated);
@@ -170,8 +172,6 @@ export default class EmployeeRouter {
                 return;
             }
 
-            console.log(employee);
-
             response.status(200).json(employee);
             return;
         } catch(error) {
@@ -191,7 +191,6 @@ export default class EmployeeRouter {
                 HttpErrorHandler.userNotFound(response);
                 return;
             }
-            console.log(employees);
             response.status(200).json(employees);
             return;
         } catch(error) {

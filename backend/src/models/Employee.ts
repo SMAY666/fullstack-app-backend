@@ -29,7 +29,7 @@ export class Employee extends BaseEntity {
     @Column()
     public salary: number;
 
-    @ManyToOne(() => Role, (role) => role.id)
+    @ManyToOne(() => Role, (role) => role.id, {nullable: true})
     public role: Role;
 
     @Column({
@@ -44,4 +44,7 @@ export class Employee extends BaseEntity {
 
     @Column()
     public passwordHash: string;
+
+    @Column({nullable: true})
+    public description: string;
 }
