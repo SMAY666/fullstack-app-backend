@@ -6,6 +6,7 @@ import passport from 'passport';
 
 import {Employee} from '../models';
 import {checkHttpRequestParameters, HttpErrorHandler, Password} from '../utils';
+import {ILike} from 'typeorm';
 
 export default class EmployeeRouter {
     constructor(expressApp: Express) {
@@ -77,7 +78,7 @@ export default class EmployeeRouter {
             });
             employee.save();
 
-            response.status(201).json({message: 'Employee created succsessfull'});
+            response.status(201).json({message: 'Employee created succsessful'});
             return;
         } catch(error) {
             HttpErrorHandler.internalServer(response, error);
@@ -125,7 +126,7 @@ export default class EmployeeRouter {
                 {value: salary, type: 'number', optional: true},
                 {value: description, type: 'string', optional: true}
             ], response)) {
-                HttpErrorHandler.invalidParameter(response);
+                return;
             }
 
             const employee = await Employee.findOneBy({id: +id});
@@ -165,7 +166,12 @@ export default class EmployeeRouter {
                 return;
             }
 
-            const employee = await Employee.findOneBy({id: +id});
+            const employee = await Employee.findOne(
+                {
+                    where: {id: +id},
+                    relations: {role: true}
+                }
+            );
 
             if (!employee) {
                 HttpErrorHandler.userNotFound(response);
@@ -181,9 +187,22 @@ export default class EmployeeRouter {
 
     private async getAll(request: Request, response: Response): Promise<void> {
         try {
+            const {query: {name}} = request;
+
+            if (!checkHttpRequestParameters([
+                {value: name as string, type: 'string'}
+            ], response)) {
+                return;
+            }
             const employees = await Employee.find(
                 {
-                    relations: {role: true}
+                    where: [
+                        {firstName: ILike(`%${name}%`)},
+                        {middleName: ILike(`%${name}%`)},
+                        {lastName: ILike(`%${name}%`)}
+                    ],
+                    relations: {role: true},
+                    order: {id: 'DESC'}
                 }
             );
 

@@ -1,9 +1,10 @@
 import {Express, Router, Request, Response} from 'express';
-import {ILike, MoreThanOrEqual, LessThanOrEqual} from 'typeorm';
+import {ILike, MoreThanOrEqual, LessThanOrEqual, IsNull} from 'typeorm';
 import passport from 'passport';
 
 import {checkHttpRequestParameters, HttpErrorHandler, isValidDateEnd} from '../utils';
 import {Event} from '../models';
+import {isNumber} from 'util';
 
 
 export default class EventRouter {
@@ -22,13 +23,14 @@ export default class EventRouter {
 
     private async create(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {title, description, dateBegin, dateEnd}} = request;
+            const {body: {title, description, dateBegin, dateEnd, issuedFor}} = request;
 
             if (!checkHttpRequestParameters([
                 {value: title, type: 'string'},
                 {value: description, type: 'string'},
                 {value: dateBegin, type: 'number'},
-                {value: dateEnd, type: 'number'}
+                {value: dateEnd, type: 'number'},
+                {value: issuedFor, type: 'number', optional: true}
             ], response)) {
                 return;
             }
@@ -38,7 +40,8 @@ export default class EventRouter {
                 description,
                 dateBegin: new Date(request.body.dateBegin),
                 dateEnd: new Date(request.body.dateEnd),
-                status: 'Open'
+                status: 'Open',
+                issuedFor: issuedFor ?? null
             });
 
             if (!isValidDateEnd(newEvent.dateBegin, newEvent.dateEnd)) {
@@ -56,37 +59,39 @@ export default class EventRouter {
 
     private async getAll(request: Request, response: Response): Promise<void> {
         try {
-            const {query: {value, dateFrom, dateTo, status}} = request;
+            const {query: {value, dateFrom, dateTo, status, issuedFor}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: value as string, type: 'string'},
-                {value: dateFrom as string, type: 'string'},
-                {value: dateTo as string, type: 'string'},
-                {value: status as string, type: 'string'}
-
+                {value: value as string, type: 'string', optional: true},
+                {value: dateFrom as string, type: 'string', optional: true},
+                {value: dateTo as string, type: 'string', optional: true},
+                {value: status as string, type: 'string', optional: true},
+                {value: issuedFor as string, type: 'string', optional: true}
             ], response)) {
                 return;
             }
+
             const events = await Event.find({
                 order: {dateBegin: 'ASC'},
+                relations: {issuedFor: true},
                 where: [
                     // TODO: Сделать дату в локальном часовом поясе
                     {
                         title: ILike(`%${value}%`),
                         ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
                         ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
-                        ...(status ? {status: status.toString()} : {})
+                        ...(status ? {status: status.toString()} : {}),
+                        ...(issuedFor ? {issuedFor: {id: +issuedFor}} : {issuedFor: IsNull()})
                     },
                     {
                         description: ILike(`%${value}%`),
                         ...(dateFrom ? {dateBegin: MoreThanOrEqual(new Date(dateFrom.toString()))} : {}),
                         ...(dateTo ? {dateEnd: LessThanOrEqual(new Date(dateTo.toString()))} : {}),
-                        ...(status ? {status: status.toString()} : {})
+                        ...(status ? {status: status.toString()} : {}),
+                        ...(issuedFor ? {issuedFor: {id: +issuedFor}} : {issuedFor: IsNull()})
                     }]
 
-            }
-            );
-
+            });
             response.status(200).json(events);
         } catch (error) {
             HttpErrorHandler.internalServer(response, error);
