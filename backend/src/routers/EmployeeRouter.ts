@@ -190,17 +190,17 @@ export default class EmployeeRouter {
             const {query: {name}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: name as string, type: 'string'}
+                {value: name as string, type: 'string', optional: true}
             ], response)) {
                 return;
             }
             const employees = await Employee.find(
                 {
-                    where: [
-                        {firstName: ILike(`%${name}%`)},
-                        {middleName: ILike(`%${name}%`)},
-                        {lastName: ILike(`%${name}%`)}
-                    ],
+                    where: {
+                        ...(name ? {firstName: ILike(`%${name}%`)} : {}),
+                        ...(name ? {middleName: ILike(`%${name}%`)} : {}),
+                        ...(name ? {lastName: ILike(`%${name}%`)} : {})
+                    },
                     relations: {role: true},
                     order: {id: 'DESC'}
                 }

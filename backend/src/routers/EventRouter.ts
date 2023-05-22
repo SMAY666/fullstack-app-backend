@@ -138,7 +138,6 @@ export default class EventRouter {
                 {value: dateEnd, type: 'string', optional: true},
                 {value: status, type: 'string', optional: true}
             ], response)) {
-                HttpErrorHandler.invalidParameter(response);
                 return;
             }
 

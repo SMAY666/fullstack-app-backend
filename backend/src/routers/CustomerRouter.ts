@@ -1,9 +1,9 @@
 // eslint linebreak-style: ["error", "windows"]
 
 
-import {Router, Express, Response, Request, query} from 'express';
+import {Router, Express, Response, Request} from 'express';
 import passport from 'passport';
-import {Customer} from '../models';
+import {Customer, Employee} from '../models';
 import {checkHttpRequestParameters, HttpErrorHandler} from '../utils';
 
 
@@ -23,7 +23,7 @@ export default class CustomerRouter {
 
     private async create(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {fullName, phoneNumber, email, description}} = request;
+            const {body: {fullName, phoneNumber, email, type, description, assignedEmployeeId}} = request;
 
 
             if (!checkHttpRequestParameters(
@@ -35,7 +35,10 @@ export default class CustomerRouter {
                         type: 'string',
                         condition: (value) => !!(value as string).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
                     },
-                    {value: description, type: 'string'}
+                    {value: type, type: 'string'},
+                    {value: description, type: 'string'},
+                    {value: assignedEmployeeId, type: 'number'}
+
                 ], response)) {
                 return;
             }
@@ -46,11 +49,19 @@ export default class CustomerRouter {
                 HttpErrorHandler.userAlreadyRegistered(response);
             }
 
+            const employee = await Employee.findOneBy({id: assignedEmployeeId});
+
+            if (!employee) {
+                HttpErrorHandler.userNotFound(response);
+            }
+
             const newCustomer = await Customer.create({
                 fullName: fullName,
                 phoneNumber: phoneNumber,
                 email: email,
+                type: type,
                 description: description,
+                assignedEmployee: {id: assignedEmployeeId},
                 documentsCount: 0
             });
 
@@ -62,6 +73,7 @@ export default class CustomerRouter {
             HttpErrorHandler.internalServer(response, error);
         }
     }
+
 
     private async getAll(request: Request, response: Response): Promise<void> {
         try {
@@ -94,7 +106,12 @@ export default class CustomerRouter {
                 return;
             }
 
-            const customer = await Customer.findOneBy({id: +id});
+            const customer = await Customer.findOne(
+                {
+                    relations: {assignedEmployee: true},
+                    where: {id: +id}
+                }
+            );
 
             if (!customer) {
                 HttpErrorHandler.userNotFound(response);
@@ -111,15 +128,16 @@ export default class CustomerRouter {
 
     private async update(request: Request, response: Response): Promise<void> {
         try {
-            const {body: {id, fullName, phoneNumber, email, description, documentsCount}} = request;
+            const {body: {id, fullName, phoneNumber, email, type, description, assignedEmployeeId}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id, type: 'number'},
+                {value: id, type: 'string'},
                 {value: fullName, type: 'string', optional: true},
                 {value: phoneNumber, type: 'string', optional: true},
                 {value: email, type: 'string', optional: true},
+                {value: type, type: 'string', optional: true},
                 {value: description, type: 'string', optional: true},
-                {value: documentsCount, type: 'number', optional: true} // Should resolve this
+                {value: assignedEmployeeId, type: 'string', optional: true}
             ], response)) {
                 return;
             }
@@ -135,8 +153,9 @@ export default class CustomerRouter {
                 fullName: request.body.fullName ?? customer.fullName,
                 phoneNumber: request.body.phoneNumber ?? customer.phoneNumber,
                 email: request.body.email ?? customer.email,
+                type: request.body.type ?? customer.type,
                 description: request.body.description ?? customer.description,
-                documentsCount: request.body.documents ?? customer.documentsCount
+                assignedEmployee: {id: request.body.assignedEmployeeId ?? customer.assignedEmployee.id}
             };
 
             await Customer.update({id: customer.id}, updated);
@@ -154,7 +173,7 @@ export default class CustomerRouter {
             const {query: {id}} = request;
 
             if (!checkHttpRequestParameters([
-                {value: id as string, type: 'number'}
+                {value: id as string, type: 'string'}
             ], response)) {
                 return;
             }
@@ -171,7 +190,7 @@ export default class CustomerRouter {
                 return;
             }
 
-            await Customer.delete({id: request.body.id});
+            await Customer.delete({id: +id});
             await Customer.save;
 
             response.status(200).json({message: 'Customer deleted successfully'});
